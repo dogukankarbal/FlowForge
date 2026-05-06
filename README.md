@@ -44,7 +44,6 @@ Given three operating-point inputs — flow rate *Q*, target head *H*, and rotat
 
 ```
 FlowForge_v1.0.html                    — Main application (self-contained, no dependencies)
-FlowForge_v1.0.py                      — Python source (same solver logic)
 FlowForge_v1.0_User_Manual.pdf        — Full user manual (English)
 FlowForge_v1_0_Kullanici_Kilavuzu.pdf — Full user manual (Turkish)
 FlowForge_v1.0_Validation_Report.pdf  — Step-by-step validation report
@@ -121,10 +120,10 @@ FlowForge v1.0 is **not appropriate** for:
 
 ## Author
 
-Developed by **Doğukan Çelik** · Mechanical / Aerospace Engineer · Turbomachinery & CFD
+Developed by **Doğukan Karbal** · Aeronautical - Astronautical Eng. 
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dogukancelik)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/dogukancelik)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dogukankarbal/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/dogukankarbal)
 
 ---
 ---
@@ -163,7 +162,6 @@ FlowForge v1.0, santrifüj pompa çarklarının ön hidrolik tasarımı için ge
 
 ```
 FlowForge_v1.0.html                    — Ana uygulama (bağımsız, harici bağımlılık yok)
-FlowForge_v1.0.py                      — Python kaynak kodu (aynı çözücü mantığı)
 FlowForge_v1.0_User_Manual.pdf        — Tam kullanım kılavuzu (İngilizce)
 FlowForge_v1_0_Kullanici_Kilavuzu.pdf — Tam kullanım kılavuzu (Türkçe)
 FlowForge_v1.0_Validation_Report.pdf  — Adım adım validasyon raporu
@@ -240,10 +238,10 @@ FlowForge v1.0 aşağıdaki durumlar için **uygun değildir**:
 
 ## Geliştirici
 
-Geliştiren: **Doğukan Çelik** · Makina / Havacılık Mühendisi · Turbomachinery & CFD
+Geliştiren: **Doğukan Karbal** · Uçak ve Uzay Müh.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dogukancelik)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/dogukancelik)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dogukankarbal/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/dogukankarbal)
 
 ---
 
