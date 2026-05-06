@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowForge v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #F7F8FC;
+  --surface:  #FFFFFF;
+  --surface2: #EEF0F7;
+  --surface3: #E5E8F2;
+  --accent:   #2A4A8F;
+  --accent-lt:#E8EDF8;
+  --accent2:  #1A6B55;
+  --accent3:  #7A3B6E;
+  --border:   rgba(40,60,120,0.10);
+  --border2:  rgba(40,60,120,0.18);
+  --text:     #161C2D;
+  --text2:    #4A5270;
+  --text3:    #8A90A8;
+  --ok:       #1A6B45; --ok-bg:   #EAF5EF;
+  --fail:     #8B1A1A; --fail-bg: #F7EAEA;
+  --warn:     #7A5010; --warn-bg: #FBF5E6;
+  --info:     #1E3A82; --info-bg: #EBF0FB;
+  --radius: 6px; --radius-sm: 4px;
+  --shadow: 0 1px 4px rgba(30,50,120,0.07), 0 0 0 1px rgba(40,60,120,0.06);
+  --font: 'Inter', sans-serif;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.65; }
+
+/* ── header ── */
+header {
+  background: var(--accent);
+  border-bottom: none;
+  padding: 0 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(30,50,120,0.18);
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.15); border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.25); }
+.logo-icon svg { width: 16px; height: 16px; fill: white; }
+.logo-text { font-size: 14px; font-weight: 600; color: white; letter-spacing: 0.01em; }
+.logo-sub  { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: -1px; letter-spacing: 0.02em; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.version-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 3px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); }
+.lang-toggle { display: flex; background: rgba(255,255,255,0.12); border-radius: 4px; padding: 2px; gap: 1px; border: 1px solid rgba(255,255,255,0.18); }
+.lang-btn { background: transparent; border: none; padding: 3px 12px; border-radius: 3px; font-size: 11px; font-weight: 600; font-family: var(--font); color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; }
+.lang-btn.active { background: rgba(255,255,255,0.95); color: var(--accent); }
+
+/* ── layout ── */
+main { max-width: 980px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.page-title { font-family: var(--serif); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 3px; color: var(--text); }
+.page-sub   { font-size: 12px; color: var(--text3); margin-bottom: 2rem; letter-spacing: 0.01em; font-family: var(--mono); }
+
+/* ── card ── */
+.card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
+.card-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.card-title::after { display: none; }
+.pill { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 3px; letter-spacing: 0.03em; text-transform: uppercase; }
+.pill-blue  { background: var(--accent-lt); color: var(--accent); border: 1px solid rgba(42,74,143,0.15); }
+.pill-green { background: #E8F4EE; color: #1A6B45; border: 1px solid rgba(26,107,69,0.15); }
+.pill-rose  { background: #F4E8F0; color: #7A3B6E; border: 1px solid rgba(122,59,110,0.15); }
+.pill-amber { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(122,80,16,0.15); }
+.pill-gray  { background: var(--surface2); color: var(--text2); border: 1px solid var(--border2); }
+.pill-teal  { background: #E6F4F1; color: #1A5C52; border: 1px solid rgba(26,92,82,0.15); }
+
+/* ── STEP 1: case count selector ── */
+.step-card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); border-left: 3px solid var(--accent); }
+.step-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+.case-count-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.case-count-row label { font-size: 13px; color: var(--text2); }
+.case-count-input { font-family: var(--mono); font-size: 16px; font-weight: 500; color: var(--text); background: var(--bg); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 6px 12px; width: 76px; outline: none; -moz-appearance: textfield; appearance: none; -webkit-appearance: none; }
+.case-count-input::-webkit-inner-spin-button, .case-count-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.case-count-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(42,74,143,0.12); }
+.apply-btn { font-family: var(--font); font-size: 12px; font-weight: 600; color: white; background: var(--accent); border: none; border-radius: var(--radius-sm); padding: 7px 18px; cursor: pointer; transition: background 0.15s; letter-spacing: 0.02em; }
+.apply-btn:hover { background: #1E3878; }
+.case-count-hint { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+/* ── case tabs ── */
+.case-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 1rem; }
+.case-tab { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.15s; letter-spacing: 0.02em; }
+.case-tab:hover { background: var(--surface2); color: var(--text); border-color: var(--accent); }
+.case-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+.case-tab.solved { border-color: var(--ok); color: var(--ok); }
+.case-tab.solved.active { background: var(--ok); color: white; border-color: var(--ok); }
+.case-tab.failed { border-color: var(--fail); color: var(--fail); }
+.case-tab.failed.active { background: var(--fail); color: white; border-color: var(--fail); }
+
+/* ── assumption banner ── */
+.assumption-banner {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--info-bg); border: 1px solid rgba(30,58,130,0.15);
+  border-left: 3px solid var(--info);
+  border-radius: var(--radius-sm); padding: 8px 12px;
+  font-size: 12px; font-family: var(--mono); color: var(--info);
+  margin-bottom: 1rem;
+}
+.assumption-banner .ab-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.assumption-banner .ab-text { flex: 1; line-height: 1.5; }
+.assumption-banner .ab-dismiss {
+  background: none; border: none; cursor: pointer;
+  font-size: 14px; color: var(--info); opacity: 0.4; padding: 0 2px;
+  line-height: 1; transition: opacity 0.15s; flex-shrink: 0; margin-top: 1px;
+}
+.assumption-banner .ab-dismiss:hover { opacity: 1; }
+.assumption-banner.hidden { display: none; }
+
+/* ── inputs ── */
+.input-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 11px; color: var(--text2); font-weight: 500; letter-spacing: 0.02em; text-transform: uppercase; }
+.field-unit { font-size: 11px; color: var(--text3); margin-top: 1px; font-family: var(--mono); }
+.note-chip { font-size: 10px; color: var(--text3); background: var(--surface2); border-radius: var(--radius-sm); padding: 2px 7px; display: inline-block; margin-top: 2px; border: 1px solid var(--border); font-family: var(--mono); }
+
+input[type=number], select {
+  font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text);
+  background: var(--bg); border: 1px solid var(--border2); border-radius: var(--radius-sm);
+  padding: 6px 10px; width: 100%; outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -moz-appearance: textfield; appearance: none; -webkit-appearance: none;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+input[type=number]:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(42,74,143,0.12); background: white; }
+select { cursor: pointer; padding-right: 26px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A90A8' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; }
+
+.q-row { display: flex; gap: 5px; }
+.q-row input { flex: 1; min-width: 0; }
+.q-row select { width: 100px; flex-shrink: 0; }
+.q-hint { font-size: 11px; font-family: var(--mono); color: var(--info); background: var(--info-bg); border-radius: var(--radius-sm); padding: 3px 8px; margin-top: 3px; min-height: 20px; border: 1px solid rgba(30,58,130,0.10); }
+
+/* ── slip model panel ── */
+.slip-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 1rem; }
+.slip-btn { font-family: var(--font); font-size: 11px; font-weight: 500; padding: 6px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg); color: var(--text2); cursor: pointer; transition: all 0.15s; text-align: center; white-space: nowrap; letter-spacing: 0.02em; }
+.slip-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--accent); }
+.slip-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+.formula-box { font-size: 11px; font-family: var(--mono); color: var(--text2); background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 1rem; line-height: 1.9; border: 1px solid var(--border); border-left: 3px solid var(--accent); }
+.formula-box .f-line { display: flex; gap: 12px; flex-wrap: wrap; }
+.formula-box .f-model { color: var(--text3); min-width: 100px; font-weight: 500; }
+.formula-box .f-eq    { color: var(--text); }
+.formula-box .f-active .f-model { color: var(--accent); font-weight: 600; }
+.formula-box .f-active .f-eq { color: var(--accent); }
+.formula-box .f-note  { font-size: 10px; color: var(--text3); margin-left: 2px; }
+.formula-box .f-sep   { border: none; border-top: 1px solid var(--border); margin: 5px 0; }
+
+.const-row { display: none; }
+.const-row.show { display: grid; }
+.z-row { display: none; }
+.z-row.show { display: grid; }
+
+.sigma-preview { font-size: 11px; font-family: var(--mono); color: var(--text3); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 10px; margin-top: 3px; display: none; }
+.sigma-preview.show { display: block; }
+
+/* ── buttons ── */
+.run-wrap { display: flex; align-items: center; gap: 8px; margin-top: 0.5rem; flex-wrap: wrap; }
+.run-btn  { font-family: var(--font); font-size: 13px; font-weight: 600; color: white; background: var(--accent); border: none; border-radius: var(--radius-sm); padding: 8px 24px; cursor: pointer; transition: background 0.15s, transform 0.1s; letter-spacing: 0.02em; }
+.run-btn:hover  { background: #1E3878; }
+.run-btn:active { transform: scale(0.98); }
+.run-all-btn { font-family: var(--font); font-size: 13px; font-weight: 600; color: white; background: var(--accent2); border: none; border-radius: var(--radius-sm); padding: 8px 20px; cursor: pointer; transition: background 0.15s, transform 0.1s; letter-spacing: 0.02em; }
+.run-all-btn:hover  { background: #145A40; }
+.run-all-btn:active { transform: scale(0.98); }
+.reset-btn { font-family: var(--font); font-size: 12px; color: var(--text3); background: transparent; border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer; transition: all 0.15s; }
+.reset-btn:hover { color: var(--text); background: var(--surface2); border-color: var(--text3); }
+.export-btn { font-family: var(--font); font-size: 12px; font-weight: 500; color: var(--accent2); background: #E8F4EE; border: 1px solid rgba(26,107,85,0.2); border-radius: var(--radius-sm); padding: 7px 16px; cursor: pointer; transition: all 0.15s; opacity: 0.38; pointer-events: none; }
+.export-btn:hover { background: #D4ECDF; }
+.export-btn.show { opacity: 1; pointer-events: auto; }
+
+/* ── status ── */
+.status { border-radius: var(--radius-sm); padding: 9px 14px; font-size: 12px; margin-bottom: 1rem; display: none; font-family: var(--mono); border: 1px solid transparent; border-left-width: 3px; }
+.status.show { display: block; }
+.status.ok   { background: var(--ok-bg);   color: var(--ok);   border-color: var(--ok); }
+.status.fail { background: var(--fail-bg); color: var(--fail); border-color: var(--fail); }
+.status.warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); }
+
+.warn-banner { display: none; background: var(--warn-bg); color: var(--warn); border-radius: var(--radius-sm); padding: 9px 14px; font-size: 12px; margin-bottom: 0.75rem; border: 1px solid rgba(122,80,16,0.2); border-left: 3px solid var(--warn); font-family: var(--mono); }
+.warn-banner.show { display: block; }
+
+/* ── results ── */
+#results { display: none; }
+#results.show { display: block; }
+
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.metric { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 12px; border: 1px solid var(--border); }
+.metric .m-lbl  { font-size: 10px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+.metric .m-val  { font-family: var(--mono); font-size: 17px; font-weight: 500; line-height: 1.2; color: var(--text); }
+.metric .m-unit { font-size: 10px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+.metric.hi      { border-color: rgba(42,74,143,0.2); background: var(--accent-lt); }
+.metric.hi .m-val { color: var(--accent); }
+.metric.sig     { border-color: rgba(26,107,69,0.2); background: #EAF5EF; }
+.metric.sig .m-val { color: var(--ok); }
+.metric.sig-warn { border-color: rgba(122,59,110,0.2); background: #F5EBF3; }
+.metric.sig-warn .m-val { color: var(--accent3); }
+
+.vbar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.vbar-row:last-child { margin-bottom: 0; }
+.vbar-lbl   { font-size: 12px; font-family: var(--mono); min-width: 56px; color: var(--text2); }
+.vbar-track { flex: 1; height: 5px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+.vbar-fill  { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.5s cubic-bezier(.25,.8,.25,1); }
+.vbar-fill.g { background: var(--accent2); }
+.vbar-fill.r { background: var(--accent3); }
+.vbar-fill.d { background: #8B68B8; }
+.vbar-num   { font-family: var(--mono); font-size: 12px; min-width: 70px; text-align: right; color: var(--text2); }
+
+.val-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.vbadge { font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: var(--radius-sm); font-family: var(--mono); letter-spacing: 0.03em; border: 1px solid transparent; }
+.vbadge.pass { background: var(--ok-bg); color: var(--ok); border-color: rgba(26,107,69,0.2); }
+.vbadge.fail { background: var(--fail-bg); color: var(--fail); border-color: rgba(139,26,26,0.2); }
+
+.sens-block { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; font-family: var(--mono); margin-bottom: 8px; }
+.sens-block .sb-title { font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text3); margin-bottom: 7px; font-weight: 600; }
+.sens-row  { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.sens-label { color: var(--text2); font-size: 11px; }
+.sens-val   { font-weight: 500; color: var(--text); }
+.flag-ok   { color: var(--ok); }
+.flag-fail { color: var(--fail); }
+.flag-msg  { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+.iter-log { font-family: var(--mono); font-size: 11.5px; color: var(--text2); background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; max-height: 200px; overflow-y: auto; line-height: 1.9; display: none; }
+.iter-log.open { display: block; }
+.iter-log .hdr  { color: var(--text3); border-bottom: 1px solid var(--border2); padding-bottom: 4px; margin-bottom: 4px; font-weight: 500; }
+.iter-log .conv { color: var(--ok); }
+.iter-toggle { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text3); cursor: pointer; user-select: none; margin-bottom: 5px; font-family: var(--mono); letter-spacing: 0.03em; }
+.iter-toggle:hover { color: var(--text2); }
+.iter-toggle .it-arrow { font-size: 9px; transition: transform 0.2s; }
+.iter-toggle.open .it-arrow { transform: rotate(90deg); }
+
+.model-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--mono); background: var(--accent-lt); border: 1px solid rgba(42,74,143,0.18); border-radius: var(--radius-sm); padding: 3px 10px; color: var(--accent); font-weight: 500; }
+.model-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.fallback-tag { font-size: 10px; font-family: var(--mono); background: var(--warn-bg); border: 1px solid rgba(122,80,16,0.2); border-radius: var(--radius-sm); padding: 2px 8px; color: var(--warn); margin-left: 4px; }
+
+/* ── comparison table ── */
+#comparison { display: none; }
+#comparison.show { display: block; }
+.cmp-table-wrap { overflow-x: auto; }
+.cmp-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--mono); }
+.cmp-table th { background: var(--surface2); color: var(--text2); font-weight: 600; font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; padding: 8px 12px; text-align: left; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.cmp-table th.case-col { background: var(--accent); color: white; text-align: center; }
+.cmp-table td { padding: 7px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+.cmp-table td.param-lbl { color: var(--text3); font-size: 10px; letter-spacing: 0.04em; white-space: nowrap; text-transform: uppercase; }
+.cmp-table td.case-val { text-align: center; font-weight: 500; }
+.cmp-table tr:last-child td { border-bottom: none; }
+.cmp-table tr:hover td { background: var(--surface2); }
+.cmp-best  { color: var(--ok); font-weight: 600; }
+.cmp-worst { color: var(--fail); }
+.cmp-section { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); background: var(--bg); }
+.cmp-section td { padding: 10px 12px 5px; color: var(--text3); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+
+footer { text-align: center; font-size: 11px; color: var(--text3); padding: 2rem 0 1rem; font-family: var(--mono); letter-spacing: 0.02em; border-top: 1px solid var(--border); margin-top: 1rem; }
+
+@media (max-width: 640px) {
+  header { padding: 0 1rem; }
+  main   { padding: 1.5rem 1rem 3rem; }
+  .input-grid { grid-template-columns: 1fr 1fr; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+  .slip-selector { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── performance curve ── */
+.perf-card-hidden { display: none; }
+.perf-tabs { display: flex; gap: 4px; margin-bottom: 1rem; flex-wrap: wrap; }
+.perf-tab { font-family: var(--font); font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.15s; letter-spacing: 0.03em; }
+.perf-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+.perf-chart-wrap { position: relative; width: 100%; height: 280px; }
+.perf-table-wrap { overflow-x: auto; margin-top: 1rem; }
+.perf-table { width: 100%; border-collapse: collapse; font-size: 11.5px; font-family: var(--mono); }
+.perf-table th { font-size: 9.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text3); padding: 5px 9px; text-align: right; border-bottom: 2px solid var(--border2); white-space: nowrap; font-weight: 600; background: var(--surface2); }
+.perf-table td { padding: 5px 10px; text-align: right; border-bottom: 1px solid var(--border); color: var(--text2); }
+.perf-table td { padding: 4px 9px; text-align: right; border-bottom: 1px solid var(--border); color: var(--text2); }
+.perf-table tr.bep { background: var(--ok-bg); color: var(--ok); font-weight: 600; }
+.perf-table td:first-child, .perf-table th:first-child { text-align: left; }
+.perf-range-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
+.perf-range-row label { font-size: 11px; color: var(--text2); font-family: var(--font); font-weight: 500; }
+.perf-range-row input { font-family: var(--mono); font-size: 12px; width: 66px; padding: 5px 8px; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--radius-sm); outline: none; color: var(--text); }
+.perf-run-btn { font-family: var(--font); font-size: 12px; font-weight: 600; color: white; background: var(--accent); border: none; border-radius: var(--radius-sm); padding: 6px 16px; cursor: pointer; transition: background 0.15s; letter-spacing: 0.02em; }
+.perf-run-btn:hover { background: #1E3878; }
+.perf-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; color: var(--text3); align-items: center; font-family: var(--mono); }
+.perf-legend-item { display: flex; align-items: center; gap: 5px; }
+.perf-legend-dot { width: 12px; height: 3px; border-radius: 1px; display: inline-block; }
+</style>
+</head>
+<body>
+
+<header>
+<div style="display:flex; align-items:center; gap:12px;">
+
+  <svg
+    viewBox="0 0 260 64"
+    width="180"
+    height="50"
+    style="display:block; overflow:visible;"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+
+    <!-- ICON -->
+    <g transform="translate(12,12)">
+
+      <circle cx="20" cy="20" r="16"
+        fill="none"
+        stroke="rgba(255,255,255,0.4)"
+        stroke-width="1.8"
+      />
+
+      <path d="M20 20 L20 6
+               M20 20 L32 10
+               M20 20 L34 20
+               M20 20 L32 30
+               M20 20 L20 34
+               M20 20 L8 30
+               M20 20 L6 20
+               M20 20 L8 10"
+        stroke="rgba(255,255,255,0.85)"
+        stroke-width="1.6"
+        stroke-linecap="round"
+      />
+
+      <circle cx="20" cy="20" r="2.6" fill="white"/>
+
+    </g>
+
+    <!-- WORDMARK -->
+    <text
+      x="68"
+      y="40"
+      font-family="system-ui, -apple-system, Segoe UI, Roboto"
+      font-size="22"
+      font-weight="650"
+      fill="white"
+      letter-spacing="0.4"
+    >
+      FlowForge
+    </text>
+
+  </svg>
+
+</div>
+    <div>
+      <div class="logo-text" id="h-title" style="color:white;">Centrifugal Pump Solver</div>
+      <div class="logo-sub"  id="h-sub">1D Meanline Preliminary Design · Multi-Case</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="version-badge">v1.0</span>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en')" id="btn-en">EN</button>
+      <button class="lang-btn"        onclick="setLang('tr')" id="btn-tr">TR</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="page-title" id="pg-title">Impeller Geometry Solver</div>
+  <div class="page-sub"   id="pg-sub">Design + Performance Mode · dual nₛ · multi-case comparison · CSV export · v1.0</div>
+
+  <!-- STEP 1: Case count -->
+  <div class="step-card">
+    <div class="step-label" id="t-step1">Step 1 — Define number of cases</div>
+    <div class="case-count-row">
+      <label id="l-ncases">Number of cases to compare:</label>
+      <input type="number" class="case-count-input" id="n_cases" value="1" min="1" max="8" step="1">
+      <button class="apply-btn" onclick="applyCaseCount()" id="apply-btn">Apply</button>
+      <span class="case-count-hint" id="case-count-hint">1–8 cases supported</span>
+    </div>
+  </div>
+
+  <!-- Case tabs -->
+  <div class="case-tabs" id="case-tabs"></div>
+
+  <!-- Case panels container -->
+  <div id="case-panels"></div>
+
+  <!-- Run controls -->
+  <div class="run-wrap" style="margin-bottom:1.25rem;">
+    <button class="run-btn"     onclick="runCurrentCase()" id="run-btn">Run Case</button>
+    <button class="run-all-btn" onclick="runAllCases()"    id="run-all-btn">Run All Cases</button>
+    <button class="reset-btn"   onclick="resetAll()"       id="rst-btn">Reset All</button>
+    <button class="export-btn"  onclick="exportCSV()"      id="export-btn">⬇ Export CSV</button>
+  </div>
+
+  <!-- Per-case status + warnings -->
+  <div style="margin-top:0.25rem;">
+    <div class="status"      id="status"></div>
+    <div class="warn-banner" id="sigma-warn-banner"></div>
+    <div class="warn-banner" id="fallback-banner"></div>
+  </div>
+
+  <!-- Per-case results -->
+  <div id="results">
+
+    <div class="card">
+      <div class="card-title"><span id="t-res">Results — Geometry &amp; Performance</span> <span class="pill pill-gray" id="res-case-label"></span></div>
+      <div style="margin-bottom:1rem;" id="model-tag-wrap"></div>
+      <div class="metrics-grid" id="metrics-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="t-vt">Velocity Triangle — Outlet</span></div>
+      <div id="vbars"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;" id="vt-note">
+        Vu₂_act = σ · Vu₂_th &nbsp;·&nbsp; V₁ ≈ 0 (zero pre-swirl)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="t-inlet">Inlet Velocity Triangle</span></div>
+      <div id="inlet-block"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="t-losses">Head &amp; Losses</span></div>
+      <div id="losses-block"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="t-eff">Efficiency</span></div>
+      <div id="eff-block"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="t-ns">Specific Speed</span></div>
+      <div id="ns-block"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="t-sens">km Sensitivity &amp; Consistency</span></div>
+      <div class="sens-block" id="sens-block"></div>
+      <div class="sens-block" id="km-ns-block" style="margin-top:0;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="t-val">Validation</span></div>
+      <div class="val-row" id="val-row"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="t-log">Iteration Log</span></div>
+      <div class="iter-toggle" id="iter-toggle" onclick="toggleIterLog()">
+        <span class="it-arrow">▶</span>
+        <span id="iter-summary">— run solver to see log —</span>
+      </div>
+      <div class="iter-log" id="iter-log"></div>
+    </div>
+
+  </div>
+
+  <!-- v5: Performance Curve card — OUTSIDE #results intentionally -->
+  <div class="card perf-card-hidden" id="perf-card">
+      <div class="card-title"><span>Performance Curves</span></div>
+      <div class="perf-range-row">
+        <label>Q range:</label>
+        <input type="number" id="perf-span-lo" value="0.3" step="0.05" min="0.05" max="0.99" title="Lower bound as fraction of Q_design (e.g. 0.3 = 30% of Q_design)">
+        <label>to</label>
+        <input type="number" id="perf-span-hi" value="1.4" step="0.05" min="1.01" max="2.5"  title="Upper bound as fraction of Q_design (e.g. 1.4 = 140% of Q_design)">
+        <label style="font-size:11px;color:var(--text3);">× Q<sub>design</sub></label>
+        <label style="margin-left:8px;">Points:</label>
+        <input type="number" id="perf-npts"    value="30"  step="5"    min="5"   max="100" title="Number of points to compute along the curve">
+        <button class="perf-run-btn" onclick="runPerformanceCurve()">Compute Curve</button>
+      </div>
+      <div class="perf-tabs" id="perf-tabs">
+        <button class="perf-tab active" onclick="switchPerfTab('H')"   id="ptab-H">H(Q)</button>
+        <button class="perf-tab"        onclick="switchPerfTab('eta')" id="ptab-eta">η(Q)</button>
+        <button class="perf-tab"        onclick="switchPerfTab('P')"   id="ptab-P">P(Q)</button>
+        <button class="perf-tab"        onclick="switchPerfTab('inc')" id="ptab-inc">Incidence(Q)</button>
+      </div>
+      <div class="perf-chart-wrap">
+        <svg class="perf-svg" id="perf-svg" viewBox="0 0 700 260" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="perf-legend" id="perf-legend" style="margin-top:20px;"></div>
+      <div class="perf-table-wrap">
+        <table class="perf-table" id="perf-table"></table>
+      </div>
+    </div>
+
+  <!-- COMPARISON SECTION -->
+  <div id="comparison">
+    <div class="card">
+      <div class="card-title"><span id="t-cmp">Case Comparison</span> <span class="pill pill-blue" id="t-cmp-p">All solved cases</span></div>
+      <div class="cmp-table-wrap">
+        <table class="cmp-table" id="cmp-table"></table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer id="footer-txt">1D Meanline Centrifugal Pump Solver v1.0 · Design + Performance Mode · Multi-Case · CSV Export</footer>
+
+<script>
+const g = 9.81;
+let slipModel = 'stodola';
+let nCases = 1;
+let activeCase = 0;         // 0-indexed
+let caseResults = [];       // array of result objects or null
+
+/* ── unit helpers ── */
+const UNITS = {
+  'm3/s': { label:'m³/s',       toSI: v     => v,               fromSI: v     => v            },
+  'lps':  { label:'L/s',        toSI: v     => v/1e3,            fromSI: v     => v*1e3        },
+  'lpm':  { label:'L/min',      toSI: v     => v/6e4,            fromSI: v     => v*6e4        },
+  'lph':  { label:'L/h',        toSI: v     => v/3.6e6,          fromSI: v     => v*3.6e6      },
+  'm3/h': { label:'m³/h',       toSI: v     => v/3600,           fromSI: v     => v*3600       },
+  'gpm':  { label:'US gal/min', toSI: v     => v*6.30902e-5,     fromSI: v     => v/6.30902e-5 },
+  'kg/s': { label:'kg/s',       toSI: (v,r) => v/r,              fromSI: (v,r) => v*r          },
+};
+function toM3s(v,u,rho){ return UNITS[u] ? UNITS[u].toSI(v,rho) : v; }
+
+/* ── Fluid Density  [A1 fix — v1.1] ─────────────────────────────────────── */
+// Water: 5th-degree polynomial fit to NIST data (0–100 °C).
+// [A1 FIX] Previous 3rd-degree polynomial had errors of 8.6–26.9 kg/m³ at
+// 60–100 °C, falsely documented as '< 0.05 kg/m³'. Replaced with a 5th-degree
+// least-squares fit to 21 NIST data points (0.1 MPa liquid phase);
+// max residual < 0.01 kg/m³ across 0–100 °C.
+// Reference: NIST Webbook, water PVT data at 0.1 MPa (liquid phase).
+function waterDensity(T){
+  T = Math.max(0, Math.min(100, T));
+  return  999.84576665
+        +   0.063223551  * T
+        -   0.0084455166 * T*T
+        +   6.7840809e-5 * T*T*T
+        -   4.3679288e-7 * T*T*T*T
+        +   1.2490966e-9 * T*T*T*T*T;
+}
+
+// EG/Water lookup table — density [kg/m³] per {pct, T} (0–100 °C, 30/50/70 %)
+// Direct table values — no interpolation
+
+// Direct lookup table — no interpolation
+const EG_RHO_TABLE = {
+  30: {0:1060, 20:1048, 40:1035, 60:1020, 80:1005, 100:990},
+  50: {0:1090, 20:1082, 40:1070, 60:1055, 80:1040, 100:1025},
+  70: {0:1130, 20:1115, 40:1100, 60:1085, 80:1070, 100:1055},
+};
+
+function fluidType(ci){
+  return document.querySelector(`input[name="fluid-type-${ci}"]:checked`)?.value ?? 'water';
+}
+
+function computeFluidRho(ci){
+  const type = fluidType(ci);
+  if(type === 'eg_water'){
+    const T  = parseInt(document.querySelector(`input[name="fluid-temp-${ci}"]:checked`)?.value ?? 80);
+    const eg = parseInt(document.querySelector(`input[name="eg-pct-${ci}"]:checked`)?.value ?? 50);
+    return EG_RHO_TABLE[eg]?.[T] ?? 1040;
+  }
+  if(type === 'water'){
+    const T = parseFloat(document.getElementById(`c${ci}_fluid-temp-water`)?.value ?? 80);
+    return Math.round(waterDensity(T) * 10) / 10;
+  }
+  return null;  // manual — caller reads rho field directly
+}
+
+function onFluidTypeChange(ci){
+  const type = fluidType(ci);
+  const isEG     = type === 'eg_water';
+  const isManual = type === 'manual';
+
+  // Water temp row: visible only for Water
+  const waterTempRow = document.getElementById(`c${ci}_water-temp-row`);
+  if(waterTempRow) waterTempRow.style.display = isEG || isManual ? 'none' : '';
+
+  // EG-specific rows: visible only for EG/Water
+  const egPctRow  = document.getElementById(`c${ci}_eg-pct-row`);
+  const egTempRow = document.getElementById(`c${ci}_eg-temp-row`);
+  if(egPctRow)  egPctRow.style.display  = isEG ? '' : 'none';
+  if(egTempRow) egTempRow.style.display = isEG ? '' : 'none';
+
+  // Density field: editable for Manual, readonly/auto for Water & EG
+  const rhoInp = document.getElementById(`c${ci}_rho`);
+  if(rhoInp) rhoInp.readOnly = !isManual;
+
+  // Note chip
+  const note = document.getElementById(`c${ci}_rho-note`);
+  if(note) note.textContent = isManual ? t('fluid-rho-manual') : t('fluid-rho-auto');
+
+  if(!isManual) onFluidTempChange(ci);
+  else updateHint(ci);
+}
+
+function onFluidTempChange(ci){
+  const rho = computeFluidRho(ci);
+  if(rho === null) return;  // manual mode — don't touch
+  const inp = document.getElementById(`c${ci}_rho`);
+  if(inp) inp.value = rho;
+  updateHint(ci);
+}
+
+function onRhoManual(ci){
+  // Called when user types into density field directly (manual mode only)
+  updateHint(ci);
+}
+
+/* ── i18n ── */
+const T = {
+  en:{
+    'h-title':'Centrifugal Pump Solver','h-sub':'1D Meanline Preliminary Design · Multi-Case · v1.0',
+    'pg-title':'Impeller Geometry Solver',
+    'pg-sub':'Design + Performance Mode · dual nₛ · multi-case comparison · CSV export · v1.0',
+    't-step1':'Number of Cases',
+    'l-ncases':'Number of cases to compare:',
+    'apply-btn':'Apply',
+    'case-count-hint':'1–8 cases supported',
+    't-op':'Operating Point','t-op-p':'Required',
+    't-slip':'Slip Model','t-slip-p':'Select a correlation',
+    't-dp':'Design Parameters','t-dp-p':'Fixed — not iterated',
+    't-fl':'Fluid & Inlet','t-fl-p':'Supplementary',
+    't-ss':'Solver Settings','t-ss-p':'Advanced',
+    't-sens':'km Sensitivity & Consistency','t-sens-p':'Gülich 2020',
+    'l-Q':'Flow rate Q','l-H':'Target head H<sub>target</sub>','l-n':'Rotational speed n',
+    'l-sigma':'Constant slip factor σ','l-Z':'Blade number Z',
+    'l-sigma-prev':'Estimated σ (preview)','fu-sigma-prev':'recomputed each iteration',
+    'l-b2':'Outlet blade angle β₂','l-km':'Meridional ratio k<sub>m</sub>',
+    'l-eta':'Overall efficiency η','l-rho':'Density ρ','l-b1':'Inlet blade angle β₁',
+    'l-u2max':'Tip speed limit u₂_max',
+    'l-al':'Relaxation factor α','l-tol':'Convergence tolerance','l-mit':'Max iterations',
+    'n-b2':'Range [15°, 45°]','n-km':'Typical: 0.10 – 0.25',
+    'n-sigma':'Typical: 0.80 – 0.92','n-Z':'Typical: 5 – 9, odd preferred',
+    'n-rho':'Water 20°C = 998 · Required for kg/s',
+    'l-fluid-type':'Fluid type','l-fluid-temp':'Temperature T',
+    'l-eg-pct':'EG concentration',
+    'fluid-water':'Water','fluid-eg':'EG / Water',
+    'fluid-manual':'Manual','fluid-rho-auto':'Auto-computed from T','fluid-rho-manual':'Enter manually',
+    'n-eg-pct':'30–70 % EG by volume',
+    'sb-stodola-lbl':'Stodola','sb-wiesner-lbl':'Wiesner',
+    'sb-pfleiderer-lbl':'Pfleiderer','sb-const-lbl':'Constant σ',
+    'run-btn':'Run Case','run-all-btn':'Run All Cases','rst-btn':'Reset All',
+    'export-btn':'⬇ Export CSV',
+    't-res':'Results — Geometry & Performance',
+    't-vt':'Velocity Triangle — Outlet','vt-note':'Vu₂_act = σ · Vu₂_th · V₁ ≈ 0 (zero pre-swirl)',
+    't-inlet':'Inlet Velocity Triangle',
+    't-losses':'Head & Losses',
+    't-eff':'Efficiency',
+    't-ns':'Specific Speed',
+    't-cmp':'Case Comparison','t-cmp-p':'All solved cases',
+    't-val':'Validation','t-log':'Iteration Log',
+    'assumption-text':'Assumption: zero inlet pre-swirl — V₁ ≈ 0,  α₁ = 90°  (no inlet guide vanes).  Vu₂_th = u₂ − Vm₂/tan β₂',
+    'footer-txt':'1D Meanline Centrifugal Pump Solver v1.0 · Design + Performance Mode · Multi-Case · CSV Export',
+    'status-ok':'Converged — all validation checks passed.',
+    'status-warn':'Converged — one or more validation checks failed. Revise design parameters.',
+    'status-fail':'Solver did not converge. Check km, β₂, Z, slip model.',
+    'status-err':'Invalid input — all fields must be positive numbers.',
+    'status-u2':'Tip speed limit exceeded — reduce n, increase β₂, or raise u₂_max.',
+    'iter-hdr':'iter    D₂ (mm)       σ    H_net (m)    error (%)',
+    'note-conv':'converged','note-init':'init',
+    'm-D2':'D₂','m-b2':'b₂','m-b2D2':'b₂/D₂',
+    'm-u2':'u₂','m-Vm2':'Vm₂','m-Vu2th':'Vu₂_th','m-Vu2act':'Vu₂_act',
+    'm-Hc':'H net','m-ns':'nₛ_delivered','m-Os':'Ωₛ','m-P':'P reported',
+    'm-b2a':'β₂','m-sig':'σ (converged)','m-Z':'Z',
+    'm-Q':'Q (input)','m-Qsi':'Q (m³/s)',
+    'v-b2':'β₂ ∈ [15°,45°]','v-bd':'b₂/D₂ ∈ [0.02,0.25]','v-ns':'nₛ_design ∈ [10,80]','v-sig':'σ ∈ [0.65,0.97]',
+    'pass':'PASS ✓','fail':'FAIL ✗',
+    'model-label-stodola':'Stodola-corrected','model-label-wiesner':'Wiesner 1967',
+    'model-label-pfleiderer':'Pfleiderer 1961','model-label-const':'Constant σ',
+    'model-label-stodola_fallback':'Stodola (Wiesner fallback)',
+    'sens-title':'km Sensitivity  (∂D₂/∂km at constant H, n, Q)',
+    'sens-formula':'∂D₂/∂km ≈ −0.5 · D₂/km',
+    'sens-dD2':'∂D₂/∂km',
+    'sens-delta':'ΔD₂ for ±10% km',
+    'km-ns-title':'km vs nₛ_design Consistency  (Gülich 2020)',
+    'l-D1':'Inlet diameter D₁',
+    'l-b1w':'Inlet width b₁',
+    'l-Vu1':'Inlet swirl Vu₁',
+    'l-Vm1t':'Target Vm₁ (auto b₁)',
+    'm-Heuler':'H_euler','m-etah':'η_h (internal)','m-Hnet':'H_net',
+    'm-ns-design':'nₛ_design','m-ns-delivered':'nₛ_delivered',
+  },
+  tr:{
+    'h-title':'Santrifüj Pompa Çözücü','h-sub':'1D Orta Çizgi Ön Tasarım · Çoklu Durum · v1.0',
+    'pg-title':'Çark Geometrisi Çözücüsü',
+    'pg-sub':'Tasarım + Performans Modu · ikili nₛ · çoklu durum karşılaştırması · CSV dışa aktarım · v1.0',
+    't-step1':'Durum Sayısı',
+    'l-ncases':'Karşılaştırılacak durum sayısı:',
+    'apply-btn':'Uygula',
+    'case-count-hint':'1–8 durum desteklenir',
+    't-op':'Çalışma Noktası','t-op-p':'Zorunlu',
+    't-slip':'Kayma Modeli','t-slip-p':'Korelasyon seçin',
+    't-dp':'Tasarım Parametreleri','t-dp-p':'Sabit — iterate edilmez',
+    't-fl':'Akışkan & Giriş','t-fl-p':'Ek Bilgiler',
+    't-ss':'Çözücü Ayarları','t-ss-p':'Gelişmiş',
+    't-sens':'km Hassasiyeti & Tutarlılığı','t-sens-p':'Gülich 2020',
+    'l-Q':'Debi Q','l-H':'Hedef basma yüksekliği H<sub>hedef</sub>','l-n':'Dönme hızı n',
+    'l-sigma':'Sabit kayma faktörü σ','l-Z':'Kanat sayısı Z',
+    'l-sigma-prev':'Tahmini σ (önizleme)','fu-sigma-prev':'her iterasyonda yeniden hesaplanır',
+    'l-b2':'Çıkış kanat açısı β₂','l-km':'Meridyonel hız oranı k<sub>m</sub>',
+    'l-eta':'Toplam verim η','l-rho':'Yoğunluk ρ','l-b1':'Giriş kanat açısı β₁',
+    'l-u2max':'Uç hız limiti u₂_max',
+    'l-al':'Gevşeme faktörü α','l-tol':'Yakınsama toleransı','l-mit':'Maks. iterasyon',
+    'n-b2':'Aralık [15°, 45°]','n-km':'Tipik: 0.10 – 0.25',
+    'n-sigma':'Tipik: 0.80 – 0.92','n-Z':'Tipik: 5 – 9, tek sayı tercih edilir',
+    'n-rho':'Su 20°C = 998 · kg/s girişi için zorunlu',
+    'l-fluid-type':'Akışkan türü','l-fluid-temp':'Sıcaklık T',
+    'l-eg-pct':'EG konsantrasyonu',
+    'fluid-water':'Su','fluid-eg':'EG / Su',
+    'fluid-manual':'Manuel','fluid-rho-auto':'Sıcaklıktan otomatik hesaplama','fluid-rho-manual':'Değeri girin',
+    'n-eg-pct':'Hacimce %30–70 EG',
+    'sb-stodola-lbl':'Stodola','sb-wiesner-lbl':'Wiesner',
+    'sb-pfleiderer-lbl':'Pfleiderer','sb-const-lbl':'Sabit σ',
+    'run-btn':'Durumu Çalıştır','run-all-btn':'Tümünü Çalıştır','rst-btn':'Tümünü Sıfırla',
+    'export-btn':'⬇ CSV İndir',
+    't-res':'Sonuçlar — Geometri & Performans',
+    't-vt':'Hız Üçgeni — Çıkış','vt-note':'Vu₂_act = σ · Vu₂_th · V₁ ≈ 0 (ön girdap yok)',
+    't-inlet':'Giriş Hız Üçgeni',
+    't-losses':'Basma Yüksekliği & Kayıplar',
+    't-eff':'Verim',
+    't-ns':'Özgül Hız',
+    't-cmp':'Durum Karşılaştırması','t-cmp-p':'Çözülen tüm durumlar',
+    't-val':'Doğrulama','t-log':'İterasyon Kaydı',
+    'assumption-text':'Varsayım: giriş ön girdabı yok — V₁ ≈ 0,  α₁ = 90°  (giriş yönlendiricisi yok).  Vu₂_th = u₂ − Vm₂/tan β₂',
+    'footer-txt':'1D Orta Çizgi Santrifüj Pompa Çözücüsü v1.0 · Çoklu Durum · CSV İndir · Kurulum gerektirmez',
+    'status-ok':'Yakınsandı — tüm doğrulama kontrolleri geçti.',
+    'status-warn':'Yakınsandı — bir veya daha fazla kontrol başarısız. Parametreleri gözden geçirin.',
+    'status-fail':'Çözücü yakınsamadı. km, β₂, Z ve kayma modelini kontrol edin.',
+    'status-err':'Geçersiz giriş — tüm alanlar pozitif sayı olmalıdır.',
+    'status-u2':'Uç hız limiti aşıldı — n azaltın, β₂ artırın veya u₂_max yükseltin.',
+    'iter-hdr':'iter    D₂ (mm)       σ    H_net (m)    hata (%)',
+    'note-conv':'yakınsadı','note-init':'başlangıç',
+    'm-D2':'D₂','m-b2':'b₂','m-b2D2':'b₂/D₂',
+    'm-u2':'u₂','m-Vm2':'Vm₂','m-Vu2th':'Vu₂_th','m-Vu2act':'Vu₂_act',
+    'm-Hc':'H net','m-ns':'nₛ_iletilen','m-Os':'Ωₛ','m-P':'P raporlanan',
+    'm-b2a':'β₂','m-sig':'σ (yakınsama)','m-Z':'Z',
+    'm-Q':'Q (girdi)','m-Qsi':'Q (m³/s)',
+    'v-b2':'β₂ ∈ [15°,45°]','v-bd':'b₂/D₂ ∈ [0.02,0.25]','v-ns':'nₛ_tasarım ∈ [10,80]','v-sig':'σ ∈ [0.65,0.97]',
+    'pass':'GEÇTİ ✓','fail':'BAŞARISIZ ✗',
+    'model-label-stodola':'Stodola-düzeltildi','model-label-wiesner':'Wiesner 1967',
+    'model-label-pfleiderer':'Pfleiderer 1961','model-label-const':'Sabit σ',
+    'model-label-stodola_fallback':'Stodola (Wiesner fallback)',
+    'sens-title':'km Hassasiyeti  (∂D₂/∂km, sabit H, n, Q)',
+    'sens-formula':'∂D₂/∂km ≈ −0.5 · D₂/km',
+    'sens-dD2':'∂D₂/∂km',
+    'sens-delta':'±%10 km için ΔD₂',
+    'km-ns-title':'km / nₛ_tasarım Tutarlılığı  (Gülich 2020)',
+    'l-D1':'Giriş çapı D₁',
+    'l-b1w':'Giriş genişliği b₁',
+    'l-Vu1':'Giriş girdabı Vu₁',
+    'l-Vm1t':'Hedef Vm₁ (oto b₁)',
+    'm-Heuler':'H_euler','m-etah':'η_h (iç)','m-Hnet':'H_net',
+    'm-ns-design':'nₛ_tasarım','m-ns-delivered':'nₛ_iletilen',
+  }
+};
+let lang='en';
+function t(k){ return T[lang][k]||k; }
+
+function setLang(l){
+  lang=l;
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  document.getElementById('btn-tr').classList.toggle('active',l==='tr');
+  document.documentElement.lang=l;
+  // update static text IDs
+  const staticIds = ['h-title','h-sub','pg-title','pg-sub','t-step1','l-ncases','apply-btn',
+    'case-count-hint','run-btn','run-all-btn','rst-btn','export-btn',
+    't-res','t-vt','vt-note','t-inlet','t-losses','t-eff','t-ns','t-cmp','t-cmp-p',
+    't-val','t-log','t-sens','footer-txt'];
+  staticIds.forEach(k=>{
+    const el=document.getElementById(k);
+    if(el) el.innerHTML=t(k);
+  });
+  // rebuild panels to update labels
+  buildCasePanels();
+  // Re-init fluid density after rebuild
+  for(let ci=0;ci<nCases;ci++) onFluidTypeChange(ci);
+  if(document.getElementById('results').classList.contains('show')) renderCaseResults(activeCase);
+  renderComparisonTable();
+}
+
+/* ── km vs ns regime (Gülich 2020) ── */
+const NS_REGIMES = [
+  {lo:10, hi:20, kmLo:0.06, kmHi:0.12, name:'low',    nsStr:'nₛ 10–20'},
+  {lo:20, hi:50, kmLo:0.10, kmHi:0.18, name:'medium', nsStr:'nₛ 20–50'},
+  {lo:50, hi:80, kmLo:0.15, kmHi:0.25, name:'high',   nsStr:'nₛ 50–80'},
+];
+
+function getKmNsFlag(ns, km){
+  const r = NS_REGIMES.find(x => ns >= x.lo && ns < x.hi);
+  if(!r) return { ok: false, msg: `nₛ_design = ${ns.toFixed(1)} out of Gülich table range [10, 80]` };
+  const ok = km >= r.kmLo && km <= r.kmHi;
+  const range = `[${r.kmLo.toFixed(2)}, ${r.kmHi.toFixed(2)}]`;
+  if(ok){
+    return { ok: true,  msg: `km = ${km.toFixed(3)}  →  ${r.name} nₛ regime (${r.nsStr}),  km range ${range}  ✓` };
+  } else {
+    const dir = km < r.kmLo ? 'low' : 'high';
+    return { ok: false, msg: `km = ${km.toFixed(3)}  →  ${dir} for ${r.name} nₛ regime (${r.nsStr}),  expected ${range}  — revise km` };
+  }
+}
+
+/* ── slip model ── */
+function computeSigma(model, Z, beta2deg, km, sigmaConst){
+  const b2r  = beta2deg * Math.PI / 180;
+  const sinb = Math.sin(b2r);
+  const tanb = Math.tan(b2r);
+  let sigma, fallback = null, modelUsed = model;
+
+  if(model === 'const'){
+    sigma = Math.max(0.65, Math.min(0.97, sigmaConst));
+    return { sigma, fallback, modelUsed: 'const' };
+  } else if(model === 'stodola'){
+    sigma = 1 - (Math.PI/Z) * sinb;
+  } else if(model === 'wiesner'){
+    const phi_lim = Math.pow(0.7/Z, 1/(1+sinb));
+    if(km >= phi_lim){
+      sigma = 1 - (Math.PI/Z) * sinb;
+      modelUsed = 'stodola_fallback';
+      fallback = `Wiesner validity exceeded (φ=${km.toFixed(4)} ≥ φ_lim=${phi_lim.toFixed(4)}) → fallback to Stodola-corrected`;
+    } else {
+      sigma = 1 - Math.sqrt(sinb) / Math.pow(Z, 0.7);
+    }
+  } else if(model === 'pfleiderer'){
+    if(tanb < 1e-9) return { sigma: 0.01, fallback: null, modelUsed: 'pfleiderer' };
+    const p = 0.65 * (1 + sinb);
+    sigma = 1 / (1 + p * km / tanb);
+  } else {
+    sigma = sigmaConst;
+  }
+  return { sigma: Math.max(0.01, Math.min(1.0, sigma)), fallback, modelUsed };
+}
+
+/* ── case panel HTML builder ── */
+function caseInputId(ci, field){ return `c${ci}_${field}`; }
+
+function buildCasePanels(){
+  const container = document.getElementById('case-panels');
+  const tabs      = document.getElementById('case-tabs');
+  tabs.innerHTML  = '';
+  container.innerHTML = '';
+
+  for(let ci=0; ci<nCases; ci++){
+    // tab
+    const tab = document.createElement('button');
+    tab.className = 'case-tab' + (ci===activeCase?' active':'');
+    if(caseResults[ci]) tab.classList.add(caseResults[ci].converged ? 'solved' : 'failed');
+    tab.id = `tab-case-${ci}`;
+    tab.textContent = `Case ${ci+1}`;
+    tab.onclick = (()=>{ const idx=ci; return ()=>switchCase(idx); })();
+    tabs.appendChild(tab);
+
+    // panel — hidden unless active
+    const panel = document.createElement('div');
+    panel.id = `panel-case-${ci}`;
+    panel.style.display = ci===activeCase ? 'block' : 'none';
+
+    // Copy-from selector (for cases > 0)
+    let copyFrom = '';
+    if(ci > 0){
+      copyFrom = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap;">
+        <span style="font-size:12px;color:var(--text3);">Copy inputs from:</span>
+        <select style="width:130px;font-size:12px;" onchange="copyCase(${ci}, this.value); this.value=''">
+          <option value="">— select case —</option>
+          ${Array.from({length:ci},(_,k)=>`<option value="${k}">Case ${k+1}</option>`).join('')}
+        </select>
+      </div>`;
+    }
+
+    // slip model for this case (stored separately)
+    const slipId = `c${ci}_slipModel`;
+
+    panel.innerHTML = `
+    ${copyFrom}
+    <!-- Operating Point -->
+    <div class="card">
+      <div class="card-title"><span>${t('t-op')}</span> <span class="pill pill-blue">${t('t-op-p')}</span></div>
+      <div class="input-grid">
+        <div class="field" style="grid-column: span 2;">
+          <label>${t('l-Q')}</label>
+          <div class="q-row">
+            <input type="number" id="${caseInputId(ci,'Q')}" value="0.05" step="any" min="0.000001" oninput="updateHint(${ci})">
+            <select id="${caseInputId(ci,'Q_unit')}" onchange="updateHint(${ci})">
+              <option value="m3/s" selected>m³/s</option>
+              <option value="lps">L/s</option>
+              <option value="lpm">L/min</option>
+              <option value="lph">L/h</option>
+              <option value="m3/h">m³/h</option>
+              <option value="gpm">gal/min</option>
+              <option value="kg/s">kg/s</option>
+            </select>
+          </div>
+          <div class="q-hint" id="${caseInputId(ci,'q-hint')}">= 0.050000 m³/s</div>
+        </div>
+        <div class="field">
+          <label>${t('l-H')}</label>
+          <input type="number" id="${caseInputId(ci,'H')}" value="40" step="1" min="1">
+          <div class="field-unit">m</div>
+        </div>
+        <div class="field">
+          <label>${t('l-n')}</label>
+          <input type="number" id="${caseInputId(ci,'n')}" value="2900" step="100" min="100">
+          <div class="field-unit">rpm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slip Model -->
+    <div class="card">
+      <div class="card-title"><span>${t('t-slip')}</span> <span class="pill pill-amber">${t('t-slip-p')}</span></div>
+      <div class="assumption-banner" id="${caseInputId(ci,'assumption-banner')}">
+        <span class="ab-icon">ℹ</span>
+        <span class="ab-text">${t('assumption-text')}</span>
+        <button class="ab-dismiss" title="Dismiss" onclick="this.closest('.assumption-banner').classList.add('hidden')">×</button>
+      </div>
+      <div class="slip-selector">
+        <button class="slip-btn active" id="${caseInputId(ci,'sb-stodola')}"    onclick="setCaseSlip(${ci},'stodola')">${t('sb-stodola-lbl')}</button>
+        <button class="slip-btn"        id="${caseInputId(ci,'sb-wiesner')}"    onclick="setCaseSlip(${ci},'wiesner')">${t('sb-wiesner-lbl')}</button>
+        <button class="slip-btn"        id="${caseInputId(ci,'sb-pfleiderer')}" onclick="setCaseSlip(${ci},'pfleiderer')">${t('sb-pfleiderer-lbl')}</button>
+        <button class="slip-btn"        id="${caseInputId(ci,'sb-const')}"      onclick="setCaseSlip(${ci},'const')">${t('sb-const-lbl')}</button>
+      </div>
+      <div class="formula-box">
+        <div class="f-line f-active" id="${caseInputId(ci,'f-stodola')}"><span class="f-model">Stodola</span><span class="f-eq">σ = 1 − (π/Z)·sin β₂</span><span class="f-note">Pfleiderer 1961 — corrected</span></div>
+        <hr class="f-sep">
+        <div class="f-line" id="${caseInputId(ci,'f-wiesner')}"><span class="f-model">Wiesner</span><span class="f-eq">σ = 1 − √sin β₂ / Z<sup>0.7</sup></span><span class="f-note">Wiesner 1967 — valid for φ &lt; φ_lim</span></div>
+        <hr class="f-sep">
+        <div class="f-line" id="${caseInputId(ci,'f-pfleiderer')}"><span class="f-model">Pfleiderer</span><span class="f-eq">σ = 1 / (1 + p·φ/tan β₂), p = 0.65·(1+sin β₂)</span></div>
+        <hr class="f-sep">
+        <div class="f-line" id="${caseInputId(ci,'f-const')}"><span class="f-model">Constant</span><span class="f-eq">σ = σ_user</span></div>
+      </div>
+      <div class="input-grid const-row" id="${caseInputId(ci,'const-row')}">
+        <div class="field">
+          <label>${t('l-sigma')}</label>
+          <input type="number" id="${caseInputId(ci,'sigma_const')}" value="0.85" step="0.01" min="0.1" max="1.0" oninput="updateCaseSigmaPreview(${ci})">
+          <div class="field-unit">— not recomputed</div>
+          <div class="note-chip">${t('n-sigma')}</div>
+        </div>
+      </div>
+      <div class="input-grid z-row show" id="${caseInputId(ci,'z-row')}">
+        <div class="field">
+          <label>${t('l-Z')}</label>
+          <input type="number" id="${caseInputId(ci,'Z')}" value="7" step="1" min="2" max="30" oninput="updateCaseSigmaPreview(${ci})">
+          <div class="field-unit">—</div>
+          <div class="note-chip">${t('n-Z')}</div>
+        </div>
+        <div class="field">
+          <label>${t('l-sigma-prev')}</label>
+          <div class="sigma-preview show" id="${caseInputId(ci,'sigma-preview')}">—</div>
+          <div class="field-unit">${t('fu-sigma-prev')}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Design Parameters -->
+    <div class="card">
+      <div class="card-title"><span>${t('t-dp')}</span> <span class="pill pill-rose">${t('t-dp-p')}</span></div>
+      <div class="input-grid">
+        <div class="field">
+          <label>${t('l-b2')}</label>
+          <input type="number" id="${caseInputId(ci,'beta2')}" value="25" step="1" min="5" max="80" oninput="updateCaseSigmaPreview(${ci})">
+          <div class="field-unit">degrees</div>
+          <div class="note-chip">${t('n-b2')}</div>
+        </div>
+        <div class="field">
+          <label>${t('l-km')}</label>
+          <input type="number" id="${caseInputId(ci,'km')}" value="0.15" step="0.01" min="0.05" max="0.5" oninput="updateCaseSigmaPreview(${ci})">
+          <div class="field-unit">— Vm₂ = k<sub>m</sub>·u₂ = φ</div>
+          <div class="note-chip">${t('n-km')}</div>
+        </div>
+        <div class="field">
+          <label>${t('l-eta')}</label>
+          <input type="number" id="${caseInputId(ci,'eta')}" value="0.75" step="0.01" min="0.1" max="1.0">
+          <div class="field-unit">— override (0 = physics-based)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fluid & Inlet -->
+    <div class="card">
+      <div class="card-title"><span>${t('t-fl')}</span> <span class="pill pill-green">${t('t-fl-p')}</span></div>
+      <div class="input-grid">
+
+        <!-- Fluid type selector: Water / EG·Water / Manual -->
+        <div class="field" style="grid-column:1/-1;">
+          <label>${t('l-fluid-type')}</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:500;">
+              <input type="radio" name="fluid-type-${ci}" id="${caseInputId(ci,'fluid-type-water')}"
+                     value="water" checked onchange="onFluidTypeChange(${ci})">
+              ${t('fluid-water')}
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:500;">
+              <input type="radio" name="fluid-type-${ci}" id="${caseInputId(ci,'fluid-type-eg')}"
+                     value="eg_water" onchange="onFluidTypeChange(${ci})">
+              ${t('fluid-eg')}
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:500;">
+              <input type="radio" name="fluid-type-${ci}" id="${caseInputId(ci,'fluid-type-manual')}"
+                     value="manual" onchange="onFluidTypeChange(${ci})">
+              ${t('fluid-manual')}
+            </label>
+          </div>
+        </div>
+
+        <!-- Water: free temperature input -->
+        <div class="field" id="${caseInputId(ci,'water-temp-row')}">
+          <label>${t('l-fluid-temp')}</label>
+          <input type="number" id="${caseInputId(ci,'fluid-temp-water')}" value="80"
+                 step="1" min="0" max="100" oninput="onFluidTempChange(${ci})">
+          <div class="field-unit">°C</div>
+          <div class="note-chip">0 – 100 °C</div>
+        </div>
+
+        <!-- EG concentration toggle (visible only for EG/Water) -->
+        <div class="field" id="${caseInputId(ci,'eg-pct-row')}" style="display:none;grid-column:1/-1;">
+          <label>${t('l-eg-pct')}</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${[30,50,70].map(v=>`<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;">
+              <input type="radio" name="eg-pct-${ci}" id="${caseInputId(ci,'eg-pct-'+v)}"
+                     value="${v}" ${v===50?'checked':''} onchange="onFluidTempChange(${ci})">
+              ${v}%
+            </label>`).join('')}
+          </div>
+          <div class="note-chip" style="margin-top:4px;">${t('n-eg-pct')}</div>
+        </div>
+
+        <!-- EG temperature toggle (visible only for EG/Water) -->
+        <div class="field" id="${caseInputId(ci,'eg-temp-row')}" style="display:none;grid-column:1/-1;">
+          <label>${t('l-fluid-temp')}</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${[0,20,40,60,80,100].map(v=>`<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;">
+              <input type="radio" name="fluid-temp-${ci}" id="${caseInputId(ci,'fluid-temp-'+v)}"
+                     value="${v}" ${v===80?'checked':''} onchange="onFluidTempChange(${ci})">
+              ${v}°C
+            </label>`).join('')}
+          </div>
+        </div>
+
+        <!-- Density — auto for Water/EG, free input for Manual -->
+        <div class="field">
+          <label>${t('l-rho')}</label>
+          <input type="number" id="${caseInputId(ci,'rho')}" value="972" step="1" min="100"
+                 oninput="onRhoManual(${ci})">
+          <div class="field-unit">kg/m³</div>
+          <div class="note-chip" id="${caseInputId(ci,'rho-note')}">${t('fluid-rho-auto')}</div>
+        </div>
+
+        
+        <div class="field">
+          <label>${t('l-b1')}</label>
+          <input type="number" id="${caseInputId(ci,'beta1')}" value="20" step="1" min="5" max="80">
+          <div class="field-unit">degrees — design input</div>
+        </div>
+        <div class="field">
+          <label>${t('l-u2max')}</label>
+          <input type="number" id="${caseInputId(ci,'u2max')}" value="200" step="10" min="10">
+          <div class="field-unit">m/s — structural limit</div>
+        </div>
+        <div class="field">
+          <label>${t('l-D1')} <span style="font-size:10px;color:var(--text3);">(0 = auto)</span></label>
+          <input type="number" id="${caseInputId(ci,'D1')}" value="0" step="0.001" min="0">
+          <div class="field-unit">m — 0 → auto = 0.5·D₂</div>
+        </div>
+        <div class="field">
+          <label>${t('l-b1w')} <span style="font-size:10px;color:var(--text3);">(0 = auto)</span></label>
+          <input type="number" id="${caseInputId(ci,'b1w')}" value="0" step="0.001" min="0">
+          <div class="field-unit">m — 0 → auto via Vm₁ target</div>
+        </div>
+        <div class="field">
+          <label>${t('l-Vu1')}</label>
+          <input type="number" id="${caseInputId(ci,'Vu1')}" value="0" step="0.1">
+          <div class="field-unit">m/s — 0 = no pre-swirl</div>
+        </div>
+        <div class="field">
+          <label>${t('l-Vm1t')}</label>
+          <input type="number" id="${caseInputId(ci,'Vm1_target')}" value="3.5" step="0.5" min="0.5" max="10">
+          <div class="field-unit">m/s — typical: 2–6 m/s</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Solver Settings -->
+    <div class="card">
+      <div class="card-title"><span>${t('t-ss')}</span> <span class="pill pill-gray">${t('t-ss-p')}</span></div>
+      <div class="input-grid">
+        <div class="field">
+          <label>${t('l-al')}</label>
+          <input type="number" id="${caseInputId(ci,'alpha')}" value="0.3" step="0.05" min="0.05" max="1.0">
+          <div class="field-unit">— D₂_new = D₂·(1+α·e)</div>
+        </div>
+        <div class="field">
+          <label>${t('l-tol')}</label>
+          <input type="number" id="${caseInputId(ci,'tol')}" value="0.01" step="0.001" min="0.0001">
+          <div class="field-unit">— |e| &lt; tol</div>
+        </div>
+        <div class="field">
+          <label>${t('l-mit')}</label>
+          <input type="number" id="${caseInputId(ci,'maxiter')}" value="200" step="10" min="10">
+          <div class="field-unit">—</div>
+        </div>
+      </div>
+    </div>`;
+
+    container.appendChild(panel);
+    // Init slip model for this case
+    if(!window._caseSlip) window._caseSlip = [];
+    if(!window._caseSlip[ci]) window._caseSlip[ci] = 'stodola';
+  }
+}
+
+function switchCase(ci){
+  document.getElementById(`panel-case-${activeCase}`).style.display='none';
+  document.getElementById(`tab-case-${activeCase}`).classList.remove('active');
+  activeCase = ci;
+  document.getElementById(`panel-case-${ci}`).style.display='block';
+  document.getElementById(`tab-case-${ci}`).classList.add('active');
+
+  // Show/hide results for this case
+  if(caseResults[ci] && caseResults[ci].converged){
+    renderCaseResults(ci);
+    if(caseResults[ci].perfCurve && caseResults[ci].perfCurve.length){
+      document.getElementById('perf-card').classList.remove('perf-card-hidden');
+      drawPerfChart(caseResults[ci].perfCurve, caseResults[ci]);
+      renderPerfTable(caseResults[ci].perfCurve, caseResults[ci]);
+    }
+  } else {
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('status').className='status';
+    document.getElementById('sigma-warn-banner').className='warn-banner';
+    document.getElementById('fallback-banner').className='warn-banner';
+  }
+}
+
+function applyCaseCount(){
+  const n = parseInt(document.getElementById('n_cases').value)||1;
+  if(n<1||n>8){ alert('Please enter a value between 1 and 8.'); return; }
+  nCases = n;
+  if(activeCase >= nCases) activeCase = 0;
+  // Preserve existing results
+  caseResults = caseResults.slice(0, nCases);
+  while(caseResults.length < nCases) caseResults.push(null);
+  if(!window._caseSlip) window._caseSlip=[];
+  while(window._caseSlip.length < nCases) window._caseSlip.push('stodola');
+  buildCasePanels();
+  switchCase(Math.min(activeCase, nCases-1));
+  // Restore sigma previews
+  for(let ci=0;ci<nCases;ci++) updateCaseSigmaPreview(ci);
+  // Init fluid density for all cases
+  for(let ci=0;ci<nCases;ci++) onFluidTypeChange(ci);
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('comparison').classList.remove('show');
+  document.getElementById('export-btn').classList.remove('show');
+}
+
+function copyCase(targetCi, sourceCiStr){
+  if(sourceCiStr==='') return;
+  const sci = parseInt(sourceCiStr);
+  const fields = ['Q','H','n','beta2','km','eta','rho','beta1','u2max','D1','b1w','Vu1','Vm1_target','alpha','tol','maxiter','Z','sigma_const'];
+  fields.forEach(f=>{
+    const src = document.getElementById(caseInputId(sci,f));
+    const tgt = document.getElementById(caseInputId(targetCi,f));
+    if(src && tgt) tgt.value = src.value;
+  });
+  // copy unit selector
+  const srcUnit = document.getElementById(caseInputId(sci,'Q_unit'));
+  const tgtUnit = document.getElementById(caseInputId(targetCi,'Q_unit'));
+  if(srcUnit && tgtUnit) tgtUnit.value = srcUnit.value;
+  // copy slip model
+  setCaseSlip(targetCi, window._caseSlip[sci]||'stodola');
+  updateHint(targetCi);
+  updateCaseSigmaPreview(targetCi);
+}
+
+function setCaseSlip(ci, model){
+  if(!window._caseSlip) window._caseSlip=[];
+  window._caseSlip[ci] = model;
+  ['stodola','wiesner','pfleiderer','const'].forEach(m=>{
+    const btn=document.getElementById(caseInputId(ci,'sb-'+m));
+    const fl =document.getElementById(caseInputId(ci,'f-'+m));
+    if(btn) btn.classList.toggle('active', m===model);
+    if(fl)  fl.classList.toggle('f-active', m===model);
+  });
+  const cr = document.getElementById(caseInputId(ci,'const-row'));
+  const zr = document.getElementById(caseInputId(ci,'z-row'));
+  const sp = document.getElementById(caseInputId(ci,'sigma-preview'));
+  if(cr) cr.classList.toggle('show', model==='const');
+  if(zr) zr.classList.toggle('show', model!=='const');
+  if(sp) sp.classList.toggle('show', model!=='const');
+  updateCaseSigmaPreview(ci);
+}
+
+function updateCaseSigmaPreview(ci){
+  const model = (window._caseSlip&&window._caseSlip[ci])||'stodola';
+  const Z    = parseInt(document.getElementById(caseInputId(ci,'Z')).value)||7;
+  const b2   = parseFloat(document.getElementById(caseInputId(ci,'beta2')).value)||25;
+  const km   = parseFloat(document.getElementById(caseInputId(ci,'km')).value)||0.15;
+  const sigC = parseFloat(document.getElementById(caseInputId(ci,'sigma_const')).value)||0.85;
+  const el   = document.getElementById(caseInputId(ci,'sigma-preview'));
+  if(!el) return;
+  if(model==='const'){ el.textContent='—'; return; }
+  const { sigma, fallback } = computeSigma(model, Z, b2, km, sigC);
+  const wlo = sigma<0.65, whi=sigma>0.97;
+  const warn = wlo?' ⚠ < 0.65':(whi?' ⚠ > 0.97':'');
+  const fbNote = fallback?' ← fallback':'';
+  el.innerHTML=`<span style="color:${wlo||whi?'var(--warn)':'var(--text)'};">${sigma.toFixed(4)}</span>${warn}<span style="color:var(--warn);font-size:10px;">${fbNote}</span>`;
+}
+
+function updateHint(ci){
+  const Q  = parseFloat(document.getElementById(caseInputId(ci,'Q')).value);
+  const u  = document.getElementById(caseInputId(ci,'Q_unit')).value;
+  const rho= parseFloat(document.getElementById(caseInputId(ci,'rho')).value)||998;
+  const el = document.getElementById(caseInputId(ci,'q-hint'));
+  if(!el) return;
+  if(isNaN(Q)||Q<=0){ el.textContent='—'; return; }
+  const si = toM3s(Q,u,rho);
+  el.textContent = u==='m3/s'? '= '+si.toExponential(4)+' m³/s' : '= '+si.toFixed(6)+' m³/s';
+}
+
+/* ── core solver (returns result object or error string) ── */
+function solveCase(ci){
+  const cid = f => caseInputId(ci,f);
+  const gv  = id => document.getElementById(id);
+
+  const Qraw  = parseFloat(gv(cid('Q')).value);
+  const unit  = gv(cid('Q_unit')).value;
+  const Htar  = parseFloat(gv(cid('H')).value);
+  const n     = parseFloat(gv(cid('n')).value);
+  const beta2d= parseFloat(gv(cid('beta2')).value);
+  const km    = parseFloat(gv(cid('km')).value);
+  const eta   = parseFloat(gv(cid('eta')).value);
+  const rho   = parseFloat(gv(cid('rho')).value);
+  const beta1 = parseFloat(gv(cid('beta1')).value);
+  const u2max = parseFloat(gv(cid('u2max')).value)||200;
+  const alpha = parseFloat(gv(cid('alpha')).value);
+  const tol   = parseFloat(gv(cid('tol')).value);
+  const maxIt = parseInt(gv(cid('maxiter')).value);
+  const Z     = parseInt(gv(cid('Z')).value)||7;
+  const sigC  = parseFloat(gv(cid('sigma_const')).value)||0.85;
+  const D1in  = parseFloat(gv(cid('D1')).value)||0;
+  const b1in  = parseFloat(gv(cid('b1w')).value)||0;
+  const Vu1   = parseFloat(gv(cid('Vu1')).value)||0;
+  const Vm1t  = parseFloat(gv(cid('Vm1_target')).value)||3.5;
+  const model = (window._caseSlip&&window._caseSlip[ci])||'stodola';
+
+  if([Qraw,Htar,n,beta2d,km,eta,rho,beta1,alpha,tol,maxIt].some(v=>isNaN(v)||v<=0))
+    return { error: 'input' };
+
+  const Q    = toM3s(Qraw, unit, rho);
+  const b2r  = beta2d * Math.PI / 180;
+
+  // [A2] Pre-solve km ≥ φ_lim guard (Wiesner only)
+  // Without this check, the iteration loop diverges when km exceeds the
+  // Wiesner validity limit: H_net goes negative → D2 grows → Vm2 increases →
+  // H_hyd dominates → H_net further negative. In JavaScript this produces NaN
+  // rather than a crash, silently delivering garbage results.
+  if(model === 'wiesner'){
+    const sinb2  = Math.sin(b2r);
+    const phi_lim = Math.pow(0.7 / Z, 1 / (1 + sinb2));
+    if(km >= phi_lim){
+      return {
+        error: 'km_phi_lim',
+        km, phi_lim,
+        msg: `km = ${km.toFixed(4)} ≥ φ_lim = ${phi_lim.toFixed(4)} ` +
+             `(Wiesner limit for Z=${Z}, β₂=${beta2d}°). ` +
+             `Reduce km below ${phi_lim.toFixed(4)}, or switch slip model.`
+      };
+    }
+  }
+
+  const uEst = Math.sqrt(g * Htar);
+  let D2     = 60 * uEst / (Math.PI * n);
+
+  const k_h = 0.15, k_i = 0.5, k_df = 1.5e-3, blockage = 0.08;
+  const log = [{i:0, D2, Hc:null, sig:null, e:null, note:'init', conv:false}];
+  let converged=false, u2,Vm2,Vu2,sigma,Hnet,e,lastFallback=null,lastModelUsed=model;
+
+  for(let i=1;i<=maxIt;i++){
+    u2  = Math.PI * D2 * n / 60;
+    Vm2 = km * u2;
+    Vu2 = u2 - Vm2 / Math.tan(b2r);
+    const sr = computeSigma(model, Z, beta2d, km, sigC);
+    sigma = sr.sigma;
+    if(sr.fallback) lastFallback = sr.fallback;
+    lastModelUsed = sr.modelUsed;
+    const H_euler_i = sigma * u2 * Vu2 / g;
+    const D1_i  = D1in > 0 ? D1in : 0.5 * D2;
+    const u1_i  = Math.PI * D1_i * n / 60;
+    const b1_i  = b1in > 0 ? b1in : Q / (Math.PI * D1_i * Vm1t);
+    const Vm1_i = Q / (Math.PI * D1_i * b1_i);
+    const b1flow_i = Math.atan(Vm1_i / (u1_i - Vu1 + 1e-12)) * 180 / Math.PI;
+    const inc_i    = beta1 - b1flow_i;
+    const ieff_i   = Math.abs(inc_i);
+    const r2_i = D2 / 2;
+    // [A2] Guard: b2 denominator must be > 0
+    const _b2den = 2 * Math.PI * r2_i * Vm2 * (1 - blockage);
+    if(_b2den <= 0) return { error:'div_b2', iter:i, D2, Vm2,
+      msg:`Solver diverged at iter ${i}: b2 denominator ≤ 0 (D2=${(D2*1e3).toFixed(2)} mm, Vm2=${Vm2.toFixed(4)} m/s).` };
+    const b2_i = Q / _b2den;
+    const Hhyd_i   = k_h * Vm2**2 / (2*g) * (D2 / b2_i);
+    const Hshock_i = k_i * (ieff_i * Math.PI/180)**2 * u1_i**2 / (2*g);
+    Hnet = H_euler_i - Hhyd_i - Hshock_i;
+    // [A2] Guard: H_net must be positive (diverging iteration)
+    if(Hnet <= 0) return { error:'hnet_neg', iter:i, D2, Hnet,
+      msg:`Solver diverged at iter ${i}: H_net = ${Hnet.toFixed(4)} m ≤ 0. Losses exceed Euler head.` };
+    e    = (Htar - Hnet) / Htar;
+    const conv = Math.abs(e) < tol;
+    const note = conv ? 'converged' : '';
+    log.push({i, D2, Hc:Hnet, sig:sigma, e, note, conv});
+    if(conv){ converged=true; break; }
+    D2 = D2 * (1 + alpha * e);
+  }
+
+  if(!converged) return { converged:false, error:'noconv', log, lastFallback, lastModelUsed, model, km, beta2d, Z, sigma };
+
+  const u2_final = Math.PI * D2 * n / 60;
+  if(u2_final > u2max) return { converged:false, error:'u2', u2_final, u2max, log };
+
+  const r2  = D2/2;
+  const b2  = Q / (2*Math.PI*r2*Vm2*(1-blockage));
+  const b2D2= b2/D2;
+  const omega = n * Math.PI / 30;
+  const D1_used = D1in>0 ? D1in : 0.5*D2;
+  const b1_used = b1in>0 ? b1in : Q/(Math.PI*D1_used*Vm1t);
+  const A1  = Math.PI*D1_used*b1_used;
+  const Vm1 = Q/A1;
+  const u1  = Math.PI*D1_used*n/60;
+  const beta1_flow = Math.atan(Vm1/(u1-Vu1+1e-12))*180/Math.PI;
+  const incidence  = beta1 - beta1_flow;
+  const i_eff      = Math.abs(incidence);
+  const W1  = Math.sqrt(Vm1**2+(u1-Vu1)**2);
+  const H_euler= sigma*u2_final*Vu2/g;
+  const H_hyd  = k_h*Vm2**2/(2*g)*(D2/b2);
+  const H_shock= k_i*(i_eff*Math.PI/180)**2*u1**2/(2*g);
+  const H_net  = H_euler - H_hyd - H_shock;
+  const b2_D2_ratio = b2/D2;
+  const P_df   = k_df*rho*omega**3*D2**5*(1+5*b2_D2_ratio);
+  const P_useful= rho*g*Q*H_net;
+  const eta_h  = (P_useful+P_df)>0 ? P_useful/(P_useful+P_df) : 0;
+  const eta_eff= eta>0 ? eta : eta_h;
+  const P      = eta_eff>0 ? P_useful/eta_eff : 0;
+  const ns_design   = n*Math.sqrt(Q)/Math.pow(H_euler>0?H_euler:0.001, 0.75);
+  const ns_delivered= n*Math.sqrt(Q)/Math.pow(H_net>0?H_net:0.001, 0.75);
+  const Os  = omega*Math.sqrt(Q)/Math.pow(g*(H_net>0?H_net:0.001),0.75);
+  const Vu2act = sigma*Vu2;
+  const ck_b2  = beta2d>=15&&beta2d<=45;
+  const ck_bd  = b2D2>=0.02&&b2D2<=0.25;
+  const ck_ns  = ns_design>=10&&ns_design<=80;
+  const ck_sig = sigma>=0.65&&sigma<=0.97;
+  const allOk  = ck_b2&&ck_bd&&ck_ns&&ck_sig;
+
+  return {
+    converged:true, allOk, log,
+    Q, unit, Qraw, rho,
+    Htar, n, beta2d, km, eta, beta1, u2max, Z, sigC,
+    model, lastModelUsed, lastFallback,
+    D2, b2, b2D2, sigma, u2_final, Vm2, Vu2, Vu2act,
+    H_euler, H_hyd, H_shock, H_net, P_df, P_useful, eta_h, eta_eff, P,
+    ns_design, ns_delivered, Os,
+    D1_used, b1_used, Vm1, u1, beta1_flow, incidence, i_eff, W1,
+    ck_b2, ck_bd, ck_ns, ck_sig, allOk: ck_b2&&ck_bd&&ck_ns&&ck_sig,
+    Vm1t, D1in, b1in, Vu1,
+    swMsgs: buildSwMsgs(sigma, incidence, eta_h, P_df, Vm1, beta2d, u2_final, Vm2)
+  };
+}
+
+function buildSwMsgs(sigma, incidence, eta_h, P_df, Vm1, beta2d, u2_final, Vm2){
+  const msgs=[];
+  if(sigma>0.97) msgs.push(`σ = ${sigma.toFixed(4)} > 0.97 — physically unrealistic (check Z, β₂)`);
+  if(sigma<0.65) msgs.push(`σ = ${sigma.toFixed(4)} < 0.65 — physically unrealistic (check Z, β₂)`);
+  else if(sigma<0.70) msgs.push(`σ = ${sigma.toFixed(4)} < 0.70 — unusually high slip`);
+  else if(sigma>0.95) msgs.push(`σ = ${sigma.toFixed(4)} > 0.95 — unusually low slip`);
+  if(Math.abs(incidence)>5){
+    let w=`P8  |incidence| = ${Math.abs(incidence).toFixed(2)}° > 5°`;
+    if(Math.abs(incidence)>15) w+=' — very high incidence';
+    msgs.push(w);
+  }
+  if(eta_h<0.6) msgs.push(`P9  η_h = ${eta_h.toFixed(4)} < 0.60`);
+  if(Vm1<2||Vm1>6) msgs.push(`P10 Vm₁ = ${Vm1.toFixed(3)} m/s outside [2.0, 6.0] m/s`);
+  return msgs;
+}
+
+/* ── run current / all ── */
+function runCurrentCase(){
+  const ci = activeCase;
+  const res = solveCase(ci);
+  caseResults[ci] = res;
+  updateTab(ci);
+
+  // clear per-case banners
+  document.getElementById('sigma-warn-banner').className='warn-banner';
+  document.getElementById('fallback-banner').className='warn-banner';
+
+  if(res.error==='input'){
+    showStatus(t('status-err'),'fail');
+    document.getElementById('results').classList.remove('show');
+    return;
+  }
+  if(res.error==='noconv'){
+    showStatus(t('status-fail'),'fail');
+    document.getElementById('results').classList.remove('show');
+    const fb=document.getElementById('fallback-banner');
+    if(res.lastFallback){fb.className='warn-banner show'; fb.textContent='⚠  '+res.lastFallback;}
+    checkUpdateComparison();
+    return;
+  }
+  if(res.error==='u2'){
+    showStatus(t('status-u2')+` (u₂ = ${res.u2_final.toFixed(1)} m/s > ${res.u2max} m/s)`,'fail');
+    document.getElementById('results').classList.remove('show');
+    checkUpdateComparison();
+    return;
+  }
+  // [A2] New error types — km ≥ φ_lim, b2 denominator collapse, H_net ≤ 0
+  if(res.error==='km_phi_lim'){
+    showStatus(`⚠ [A2] Wiesner limit exceeded — ${res.msg}`, 'fail');
+    document.getElementById('results').classList.remove('show');
+    checkUpdateComparison();
+    return;
+  }
+  if(res.error==='div_b2' || res.error==='hnet_neg'){
+    showStatus(`⚠ [A2] Solver diverged — ${res.msg}`, 'fail');
+    document.getElementById('results').classList.remove('show');
+    checkUpdateComparison();
+    return;
+  }
+
+  renderCaseResults(ci);
+  checkUpdateComparison();
+}
+
+function runAllCases(){
+  for(let ci=0;ci<nCases;ci++){
+    caseResults[ci] = solveCase(ci);
+    updateTab(ci);
+  }
+  // Show the active case
+  const res = caseResults[activeCase];
+  document.getElementById('sigma-warn-banner').className='warn-banner';
+  document.getElementById('fallback-banner').className='warn-banner';
+  if(res && res.converged) renderCaseResults(activeCase);
+  else {
+    document.getElementById('results').classList.remove('show');
+    showStatus(res&&res.error==='noconv'?t('status-fail'):t('status-err'),'fail');
+  }
+  checkUpdateComparison();
+}
+
+function checkUpdateComparison(){
+  const solved = caseResults.filter(r=>r&&r.converged);
+  if(solved.length >= 2){
+    renderComparisonTable();
+    document.getElementById('comparison').classList.add('show');
+    document.getElementById('export-btn').classList.add('show');
+  } else if(solved.length===1){
+    document.getElementById('comparison').classList.remove('show');
+    document.getElementById('export-btn').classList.add('show');
+  } else {
+    document.getElementById('comparison').classList.remove('show');
+    document.getElementById('export-btn').classList.remove('show');
+  }
+}
+
+function updateTab(ci){
+  const tab=document.getElementById(`tab-case-${ci}`);
+  if(!tab) return;
+  tab.classList.remove('solved','failed');
+  const r = caseResults[ci];
+  if(r && r.converged) tab.classList.add('solved');
+  else if(r && !r.converged && r.error) tab.classList.add('failed');
+}
+
+function resetAll(){
+  caseResults = Array(nCases).fill(null);
+  for(let ci=0;ci<nCases;ci++) updateTab(ci);
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('comparison').classList.remove('show');
+  document.getElementById('export-btn').classList.remove('show');
+  document.getElementById('status').className='status';
+  document.getElementById('sigma-warn-banner').className='warn-banner';
+  document.getElementById('fallback-banner').className='warn-banner';
+  document.getElementById('perf-card').classList.add('perf-card-hidden');
+}
+
+/* ── render results for one case ── */
+function renderCaseResults(ci){
+  const res = caseResults[ci];
+  if(!res||!res.converged) return;
+  const {
+    Q, Qraw, unit, rho,
+    D2, b2, b2D2, sigma, u2_final, Vm2, Vu2, Vu2act,
+    H_euler, H_hyd, H_shock, H_net, P_df, P_useful, eta_h, eta, eta_eff, P,
+    ns_design, ns_delivered, Os,
+    D1_used, b1_used, Vm1, u1, beta1_flow, incidence, i_eff, W1,
+    lastModelUsed, lastFallback, model,
+    ck_b2, ck_bd, ck_ns, ck_sig, allOk,
+    swMsgs, log, beta2d, beta1, Vm1t, D1in, b1in, Vu1, km, Z,
+  } = res;
+
+  document.getElementById('res-case-label').textContent = `Case ${ci+1}`;
+  showStatus(allOk?t('status-ok'):t('status-warn'), allOk?'ok':'warn');
+
+  const fbBanner = document.getElementById('fallback-banner');
+  fbBanner.className='warn-banner'+(lastFallback?' show':'');
+  if(lastFallback) fbBanner.textContent='⚠  '+lastFallback;
+
+  const swBanner=document.getElementById('sigma-warn-banner');
+  swBanner.className='warn-banner'+(swMsgs.length?' show':'');
+  swBanner.innerHTML=swMsgs.map(m=>`<div>⚠  ${m}</div>`).join('');
+
+  const dots={stodola:'#8B9EC9',wiesner:'#B8C8A2',pfleiderer:'#C9A8B8',const:'#9B9088',stodola_fallback:'#C9A8B8'};
+  const modelUsedLabel = t('model-label-'+lastModelUsed)||lastModelUsed;
+  const fallbackTag = (lastModelUsed!==model)?`<span class="fallback-tag">← fallback from Wiesner</span>`:'';
+  document.getElementById('model-tag-wrap').innerHTML=
+    `<span class="model-tag"><span class="model-dot" style="background:${dots[lastModelUsed]||'#9B9088'}"></span>`+
+    `${modelUsedLabel} · Z = ${model==='const'?'—':Z} · σ = ${sigma.toFixed(4)}</span>${fallbackTag}`;
+
+  const Qdisp = UNITS[unit]?UNITS[unit].fromSI(Q,rho):Q;
+  const Qlbl  = UNITS[unit]?UNITS[unit].label:unit;
+  const sigCls= (sigma<0.65||sigma>0.97)?'sig-warn':'sig';
+
+  const metrics=[
+    {k:'m-Q',      v:Qdisp.toPrecision(5),   u:Qlbl,   c:''},
+    {k:'m-Qsi',    v:Q.toFixed(6),             u:'m³/s', c:''},
+    {k:'m-D2',     v:(D2*1e3).toFixed(2),      u:'mm',   c:'hi'},
+    {k:'m-b2',     v:(b2*1e3).toFixed(3),      u:'mm',   c:''},
+    {k:'m-b2D2',   v:b2D2.toFixed(4),          u:'—',    c:''},
+    {k:'m-sig',    v:sigma.toFixed(4),          u:'—',    c:sigCls},
+    {k:'m-Z',      v:model==='const'?'—':String(Z), u:'—', c:''},
+    {k:'m-u2',     v:u2_final.toFixed(3),       u:'m/s',  c:'hi'},
+    {k:'m-Vm2',    v:Vm2.toFixed(3),            u:'m/s',  c:''},
+    {k:'m-Vu2th',  v:Vu2.toFixed(3),            u:'m/s',  c:''},
+    {k:'m-Vu2act', v:Vu2act.toFixed(3),         u:'m/s',  c:''},
+    {k:'m-Heuler', v:H_euler.toFixed(3),        u:'m',    c:''},
+    {k:'m-Hnet',   v:H_net.toFixed(3),          u:'m',    c:'hi'},
+    {k:'m-etah',   v:eta_h.toFixed(4),          u:'—',    c:eta_h>=0.6?'sig':'sig-warn'},
+    {k:'m-ns',     v:ns_delivered.toFixed(2),   u:'—',    c:''},
+    {k:'m-Os',     v:Os.toFixed(4),             u:'—',    c:''},
+    {k:'m-P',      v:(P/1e3).toFixed(3),        u:'kW',   c:''},
+    {k:'m-b2a',    v:beta2d.toFixed(1),         u:'°',    c:''},
+  ];
+  document.getElementById('metrics-grid').innerHTML=metrics.map(m=>
+    `<div class="metric ${m.c}"><div class="m-lbl">${t(m.k)}</div><div class="m-val">${m.v}</div><div class="m-unit">${m.u}</div></div>`
+  ).join('');
+
+  const maxV=Math.max(u2_final,Vm2,Vu2,Vu2act)*1.1;
+  document.getElementById('vbars').innerHTML=[
+    {l:'u₂',v:u2_final,c:''},{l:'Vm₂',v:Vm2,c:'g'},{l:'Vu₂_th',v:Vu2,c:'r'},{l:'Vu₂_act',v:Vu2act,c:'d'}
+  ].map(b=>`<div class="vbar-row">
+    <div class="vbar-lbl">${b.l}</div>
+    <div class="vbar-track"><div class="vbar-fill ${b.c}" style="width:${(b.v/maxV*100).toFixed(1)}%"></div></div>
+    <div class="vbar-num">${b.v.toFixed(3)} m/s</div>
+  </div>`).join('');
+
+  const incSign=incidence>=0?'+':'';
+  const incClass=Math.abs(incidence)>5?'sig-warn':'';
+  document.getElementById('inlet-block').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;">
+    ${[
+      {l:'D₁',v:(D1_used*1e3).toFixed(2),u:'mm',cls:''},
+      {l:'b₁',v:(b1_used*1e3).toFixed(3),u:'mm',cls:''},
+      {l:'u₁',v:u1.toFixed(3),u:'m/s',cls:''},
+      {l:'Vm₁',v:Vm1.toFixed(3),u:'m/s',cls:Vm1<2||Vm1>6?'sig-warn':''},
+      {l:'W₁',v:W1.toFixed(3),u:'m/s',cls:''},
+      {l:'β₁_flow',v:beta1_flow.toFixed(2),u:'°',cls:''},
+      {l:'β₁_design',v:beta1.toFixed(1),u:'°',cls:''},
+      {l:'incidence',v:incSign+incidence.toFixed(2),u:'°',cls:incClass},
+    ].map(m=>`<div class="metric ${m.cls}"><div class="m-lbl">${m.l}</div><div class="m-val">${m.v}</div><div class="m-unit">${m.u}</div></div>`).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:10px;">
+      D₁ ${D1in>0?'user':'auto = 0.5·D₂'} · b₁ ${b1in>0?'user':'auto via Vm₁ target = '+Vm1t+' m/s'} · i_eff = ${i_eff.toFixed(2)}° (no clamp — v4.2)
+    </div>`;
+
+  document.getElementById('losses-block').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin-bottom:12px;">
+    ${[
+      {l:'H_euler',v:H_euler.toFixed(3),u:'m',note:'σ·u₂·Vu₂/g',hi:false},
+      {l:'H_hyd',v:H_hyd.toFixed(3),u:'m',note:'k_h=0.15 · D₂/b₂',hi:false},
+      {l:'H_shock',v:H_shock.toFixed(3),u:'m',note:'k_i=0.5 · no clamp',hi:false},
+      {l:'H_net',v:H_net.toFixed(3),u:'m',note:'Euler − hyd − shock',hi:true},
+      {l:'P_df',v:(P_df/1e3).toFixed(3),u:'kW',note:'width-corr. v4.2',hi:false},
+      {l:'P_shaft',v:((P_useful+P_df)/1e3).toFixed(3),u:'kW',note:'P_useful + P_df',hi:false},
+    ].map(m=>`<div class="metric ${m.hi?'hi':''}"><div class="m-lbl">${m.l}</div><div class="m-val">${m.v}</div><div class="m-unit">${m.u}</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">${m.note}</div></div>`).join('')}
+    </div>
+    <div class="sens-block">
+      <div class="sb-title">Loss split — % of H_euler</div>
+      ${[
+        {l:'H_hyd  (outlet friction, D₂/b₂-scaled)',v:H_hyd,c:'var(--accent)'},
+        {l:'H_shock (incidence, no clamp)',v:H_shock,c:'var(--accent3)'},
+        {l:'P_df/ρgQ  (disk friction)',v:P_df/(rho*g*Q),c:'var(--accent2)'},
+      ].map(b=>{
+        const pct=H_euler>0?b.v/H_euler*100:0;
+        return `<div class="vbar-row">
+          <div class="vbar-lbl" style="min-width:210px;font-size:11px;">${b.l}</div>
+          <div class="vbar-track"><div class="vbar-fill" style="width:${Math.min(pct,100).toFixed(1)}%;background:${b.c};"></div></div>
+          <div class="vbar-num">${b.v.toFixed(3)} m &nbsp;(${pct.toFixed(1)}%)</div>
+        </div>`;
+      }).join('')}
+      <div style="font-size:11px;color:var(--info);margin-top:8px;">ⓘ  P_df shown as equivalent head P_df/(ρgQ) — NOT deducted from H_net.</div>
+    </div>`;
+
+  const etaBarW=Math.min(100,eta_h*100).toFixed(1);
+  document.getElementById('eff-block').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin-bottom:12px;">
+    ${[
+      {l:'η_h (internal)', v:eta_h.toFixed(4), u:'P_useful/P_shaft', c:eta_h>=0.6?'sig':'sig-warn'},
+      {l:'η_total_input',  v:eta>=0?eta.toFixed(4):'—', u:eta>0?'dp.eta override':'= η_h', c:''},
+      {l:'η_eff (governs P)', v:eta_eff.toFixed(4), u:eta>0?'override active':'= η_h', c:''},
+      {l:'P_useful', v:(P_useful/1e3).toFixed(3), u:'kW = ρgQ·H_net', c:''},
+      {l:'P_df',     v:(P_df/1e3).toFixed(3),     u:'kW (disk friction)', c:''},
+      {l:'P_shaft',  v:((P_useful+P_df)/1e3).toFixed(3), u:'kW = P_useful+P_df', c:'hi'},
+      {l:'P reported', v:(P/1e3).toFixed(3),       u:'kW = P_useful/η_eff', c:'hi'},
+    ].map(m=>`<div class="metric ${m.c}"><div class="m-lbl">${m.l}</div><div class="m-val">${m.v}</div><div class="m-unit">${m.u}</div></div>`).join('')}
+    </div>
+    <div class="sens-block">
+      <div class="sb-title">η_h = P_useful / P_shaft</div>
+      <div class="vbar-row">
+        <div class="vbar-lbl">η_h</div>
+        <div class="vbar-track"><div class="vbar-fill" style="width:${etaBarW}%;background:${eta_h>=0.6?'var(--accent2)':'var(--accent3)'}"></div></div>
+        <div class="vbar-num">${(eta_h*100).toFixed(1)} %</div>
+      </div>
+    </div>`;
+
+  document.getElementById('ns-block').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:12px;">
+      <div class="metric hi"><div class="m-lbl">nₛ_design</div><div class="m-val">${ns_design.toFixed(2)}</div><div class="m-unit">n√Q / H_euler^0.75</div></div>
+      <div class="metric"><div class="m-lbl">nₛ_delivered</div><div class="m-val">${ns_delivered.toFixed(2)}</div><div class="m-unit">n√Q / H_net^0.75</div></div>
+      <div class="metric"><div class="m-lbl">Ωₛ (dimless)</div><div class="m-val">${Os.toFixed(4)}</div><div class="m-unit">ω√Q / (gH_net)^0.75</div></div>
+      <div class="metric"><div class="m-lbl">Cross-check</div><div class="m-val">${(Os*52.93).toFixed(2)}</div><div class="m-unit">Ωₛ × 52.93</div></div>
+    </div>`;
+
+  const dD2_dkm = -0.5*D2/km;
+  const delta_km= 0.10*km;
+  const delta_D2= dD2_dkm*delta_km*1e3;
+  document.getElementById('sens-block').innerHTML=
+    `<div class="sb-title">${t('sens-title')}</div>
+     <div class="sens-row"><span class="sens-label">${t('sens-formula')}</span><span class="sens-val">${(dD2_dkm*1e3).toFixed(1)} mm / unit km</span></div>
+     <div class="sens-row" style="margin-top:6px;"><span class="sens-label">${t('sens-delta')}</span><span class="sens-val">${Math.abs(delta_D2).toFixed(2)} mm  (km ↑10% → D₂ ${delta_D2<0?'↓':'↑'}${Math.abs(delta_D2).toFixed(2)} mm)</span></div>`;
+
+  const flag=getKmNsFlag(ns_design,km);
+  document.getElementById('km-ns-block').innerHTML=
+    `<div class="sb-title">${t('km-ns-title')}</div>
+     <div class="sens-row"><span class="sens-label">nₛ_design = ${ns_design.toFixed(2)}</span><span class="sens-val ${flag.ok?'flag-ok':'flag-fail'}">${flag.ok?'✓':'✗'}</span></div>
+     <div class="flag-msg">${flag.msg}</div>`;
+
+  document.getElementById('val-row').innerHTML=[
+    {k:'v-b2',ok:ck_b2,v:beta2d.toFixed(1)+'°'},
+    {k:'v-bd',ok:ck_bd,v:b2D2.toFixed(4)},
+    {k:'v-ns',ok:ck_ns,v:ns_design.toFixed(2)+' (design)'},
+    {k:'v-sig',ok:ck_sig,v:sigma.toFixed(4)},
+  ].map(c=>`<span class="vbadge ${c.ok?'pass':'fail'}">${t(c.ok?'pass':'fail')} &nbsp; ${t(c.k)} → ${c.v}</span>`).join('');
+
+  const logEl=document.getElementById('iter-log');
+  const nIter = log.length - 1; // exclude init row
+  const convRow = log.find(s => s.conv);
+  const summaryEl = document.getElementById('iter-summary');
+  if(summaryEl){
+    summaryEl.textContent = convRow
+      ? `Converged in ${nIter} iteration${nIter!==1?'s':''} · D₂ = ${(convRow.D2*1e3).toFixed(3)} mm · error = ${(Math.abs(convRow.e)*100).toFixed(4)}%`
+      : `${nIter} iterations — did not converge`;
+  }
+  // keep log collapsed, don't auto-open
+  logEl.classList.remove('open');
+  const toggleEl = document.getElementById('iter-toggle');
+  if(toggleEl) toggleEl.classList.remove('open');
+  logEl.innerHTML=`<div class="hdr">${t('iter-hdr')}</div>`+
+    log.map(s=>{
+      const sig=s.sig!==null?s.sig.toFixed(4).padStart(7):'      —';
+      const Hc =s.Hc!==null?s.Hc.toFixed(3).padStart(10):'         —';
+      const err=s.e!==null?(s.e*100).toFixed(3).padStart(9)+'%':'        —';
+      const noteLabel = s.conv ? t('note-conv') : (s.note==='init' ? t('note-init') : '');
+      const note=noteLabel?`  ← ${noteLabel}`:'';
+      const cls=s.conv?' class="conv"':'';
+      return `<div${cls}>${String(s.i).padStart(4)}  ${(s.D2*1e3).toFixed(3).padStart(9)}  ${sig}  ${Hc}  ${err}${note}</div>`;
+    }).join('');
+  logEl.scrollTop=logEl.scrollHeight;
+
+  document.getElementById('results').classList.add('show');
+  // Always show perf-card after a successful design solve
+  document.getElementById('perf-card').classList.remove('perf-card-hidden');
+}
+
+/* ── comparison table ── */
+function renderComparisonTable(){
+  const solved = caseResults.map((r,i)=>({r,i})).filter(x=>x.r&&x.r.converged);
+  if(solved.length<2){ document.getElementById('comparison').classList.remove('show'); return; }
+
+  // Rows definition: [label, unit, key/fn, higherIsBetter]
+  const rows = [
+    // inputs
+    ['__section','Operating Point'],
+    ['Q (m³/s)',    'm³/s', r=>r.Q.toFixed(6),           null],
+    ['H_target',   'm',    r=>r.Htar.toFixed(2),         null],
+    ['n',          'rpm',  r=>r.n.toFixed(0),            null],
+    ['β₂ (design)','°',    r=>r.beta2d.toFixed(1),       null],
+    ['km',         '—',    r=>r.km.toFixed(3),           null],
+    ['Slip model', '—',    r=>r.lastModelUsed,           null],
+    // geometry
+    ['__section','Geometry'],
+    ['D₂',         'mm',  r=>(r.D2*1e3).toFixed(2),     false],
+    ['b₂',         'mm',  r=>(r.b2*1e3).toFixed(3),     null],
+    ['b₂/D₂',     '—',   r=>r.b2D2.toFixed(4),         null],
+    ['σ',          '—',   r=>r.sigma.toFixed(4),        null],
+    // velocity triangle
+    ['__section','Velocity Triangle (Outlet)'],
+    ['u₂',         'm/s', r=>r.u2_final.toFixed(3),     false],
+    ['Vm₂',        'm/s', r=>r.Vm2.toFixed(3),          null],
+    ['Vu₂_act',    'm/s', r=>r.Vu2act.toFixed(3),       null],
+    // head & losses
+    ['__section','Head & Losses'],
+    ['H_euler',    'm',   r=>r.H_euler.toFixed(3),      null],
+    ['H_hyd',      'm',   r=>r.H_hyd.toFixed(3),        false],
+    ['H_shock',    'm',   r=>r.H_shock.toFixed(3),      false],
+    ['H_net',      'm',   r=>r.H_net.toFixed(3),        true],
+    // efficiency & power
+    ['__section','Efficiency & Power'],
+    ['η_h',        '—',   r=>r.eta_h.toFixed(4),        true],
+    ['P_df',       'kW',  r=>(r.P_df/1e3).toFixed(3),  false],
+    ['P reported', 'kW',  r=>(r.P/1e3).toFixed(3),     false],
+    // specific speed
+    ['__section','Specific Speed'],
+    ['nₛ_design',  '—',   r=>r.ns_design.toFixed(2),   null],
+    ['nₛ_delivered','—',  r=>r.ns_delivered.toFixed(2),null],
+    ['Ωₛ',         '—',   r=>r.Os.toFixed(4),           null],
+    // validation
+    ['__section','Validation'],
+    ['All checks', '—',   r=>r.allOk?'✓ PASS':'✗ FAIL', null],
+  ];
+
+  const caseIndices = solved.map(x=>x.i);
+  let html = `<thead><tr><th>Parameter</th><th>Unit</th>${caseIndices.map(i=>`<th class="case-col">Case ${i+1}</th>`).join('')}</tr></thead><tbody>`;
+
+  rows.forEach(row=>{
+    if(row[0]==='__section'){
+      html+=`<tr class="cmp-section"><td colspan="${2+caseIndices.length}">${row[1]}</td></tr>`;
+      return;
+    }
+    const [label, unit, fn, hib] = row;
+    const vals = solved.map(x=>fn(x.r));
+    const numVals = vals.map(v=>parseFloat(v));
+    const allNum  = numVals.every(v=>!isNaN(v));
+    let best=-1, worst=-1;
+    if(allNum && hib!==null){
+      if(hib===true){
+        const mx=Math.max(...numVals); best=numVals.indexOf(mx);
+        const mn=Math.min(...numVals); worst=numVals.indexOf(mn);
+      } else {
+        const mn=Math.min(...numVals); best=numVals.indexOf(mn);
+        const mx=Math.max(...numVals); worst=numVals.indexOf(mx);
+      }
+    }
+    html+=`<tr><td class="param-lbl">${label}</td><td class="param-lbl">${unit}</td>`;
+    vals.forEach((v,idx)=>{
+      const cls = idx===best&&best!==worst?'cmp-best':idx===worst&&best!==worst?'cmp-worst':'';
+      html+=`<td class="case-val ${cls}">${v}</td>`;
+    });
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  document.getElementById('cmp-table').innerHTML=html;
+  document.getElementById('t-cmp-p').textContent=`${solved.length} solved cases`;
+}
+
+/* ── CSV export ── */
+function exportCSV(){
+  const solved = caseResults.map((r,i)=>({r,i})).filter(x=>x.r&&x.r.converged);
+  if(!solved.length){ alert('No solved cases to export.'); return; }
+
+  const fields = [
+    ['Case','',      (r,i)=>`Case ${i+1}`],
+    ['Q','m³/s',     (r)=>r.Q.toFixed(6)],
+    ['H_target','m', (r)=>r.Htar.toFixed(3)],
+    ['n','rpm',      (r)=>r.n.toFixed(0)],
+    ['beta2_design','deg',(r)=>r.beta2d.toFixed(1)],
+    ['km','—',       (r)=>r.km.toFixed(4)],
+    ['slip_model','—',(r)=>r.lastModelUsed],
+    ['Z','—',        (r)=>r.Z],
+    ['sigma','—',    (r)=>r.sigma.toFixed(6)],
+    ['D2','mm',      (r)=>(r.D2*1e3).toFixed(4)],
+    ['b2','mm',      (r)=>(r.b2*1e3).toFixed(4)],
+    ['b2_D2','—',    (r)=>r.b2D2.toFixed(6)],
+    ['u2','m/s',     (r)=>r.u2_final.toFixed(4)],
+    ['Vm2','m/s',    (r)=>r.Vm2.toFixed(4)],
+    ['Vu2_th','m/s', (r)=>r.Vu2.toFixed(4)],
+    ['Vu2_act','m/s',(r)=>r.Vu2act.toFixed(4)],
+    ['H_euler','m',  (r)=>r.H_euler.toFixed(4)],
+    ['H_hyd','m',    (r)=>r.H_hyd.toFixed(4)],
+    ['H_shock','m',  (r)=>r.H_shock.toFixed(4)],
+    ['H_net','m',    (r)=>r.H_net.toFixed(4)],
+    ['eta_h','—',    (r)=>r.eta_h.toFixed(6)],
+    ['eta_eff','—',  (r)=>r.eta_eff.toFixed(6)],
+    ['P_df','kW',    (r)=>(r.P_df/1e3).toFixed(4)],
+    ['P_useful','kW',(r)=>(r.P_useful/1e3).toFixed(4)],
+    ['P_shaft','kW', (r)=>((r.P_useful+r.P_df)/1e3).toFixed(4)],
+    ['P_reported','kW',(r)=>(r.P/1e3).toFixed(4)],
+    ['ns_design','—',(r)=>r.ns_design.toFixed(4)],
+    ['ns_delivered','—',(r)=>r.ns_delivered.toFixed(4)],
+    ['Omega_s','—',  (r)=>r.Os.toFixed(6)],
+    ['D1_used','mm', (r)=>(r.D1_used*1e3).toFixed(4)],
+    ['b1_used','mm', (r)=>(r.b1_used*1e3).toFixed(4)],
+    ['u1','m/s',     (r)=>r.u1.toFixed(4)],
+    ['Vm1','m/s',    (r)=>r.Vm1.toFixed(4)],
+    ['beta1_flow','deg',(r)=>r.beta1_flow.toFixed(3)],
+    ['incidence','deg',(r)=>r.incidence.toFixed(3)],
+    ['val_all_ok','—',(r)=>r.allOk?'TRUE':'FALSE'],
+  ];
+
+  // Header row 1: parameter names
+  const hdr1 = fields.map(f=>f[0]).join(',');
+  // Header row 2: units
+  const hdr2 = fields.map(f=>f[1]).join(',');
+  // Data rows
+  const dataRows = solved.map(({r,i})=>
+    fields.map(f=>{ try{ return `"${f[2](r,i)}"`; } catch(e){ return '""'; } }).join(',')
+  );
+
+  const csv = [hdr1, hdr2, ...dataRows].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download='pump_solver_v4_3_results.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ── v5: Performance Mode ── */
+
+let _perfTab = 'H';
+
+function switchPerfTab(tab){
+  _perfTab = tab;
+  ['H','eta','P','inc'].forEach(t=>{
+    const b=document.getElementById('ptab-'+t);
+    if(b) b.classList.toggle('active', t===tab);
+  });
+  const res = caseResults[activeCase];
+  if(res && res.perfCurve && res.perfCurve.length) drawPerfChart(res.perfCurve, res);
+}
+
+/**
+ * computePerformanceCurve(design, Qlist)
+ * Mirrors Python compute_performance_curve() exactly.
+ * design = { D2, b2, D1, b1, n, beta2, beta1, Z, sigma_const,
+ *             slip_model, slip_model_used, k_h, k_i, k_df, rho, Q_design, Vu1 }
+ */
+function computePerformanceCurve(design, Qlist){
+  const { D2, b2, D1, b1, n, beta2, Z, sigma_const, slip_model,
+          k_h, k_i, k_df, rho, beta1: beta1_design, Vu1 } = design;
+  const b2r  = beta2 * Math.PI / 180;
+  const r2   = D2 / 2;
+  const u2   = Math.PI * D2 * n / 60;
+  const u1   = Math.PI * D1 * n / 60;
+  const omega= n * Math.PI / 30;
+  const A1   = Math.PI * D1 * b1;
+
+  // Disk friction — geometry-based, constant
+  const b2D2r = b2 / D2;
+  const P_df  = k_df * rho * omega**3 * D2**5 * (1 + 5 * b2D2r);
+
+  const pts = [];
+  for(const Q of Qlist){
+    if(Q <= 0) continue;
+
+    // Outlet — Vm2 from continuity, NOT km·u2
+    const Vm2  = Q / (2 * Math.PI * r2 * b2);
+    const km   = Vm2 / u2;
+    const Vu2_th = u2 - Vm2 / Math.tan(b2r);
+
+    // Slip — f(km), not constant
+    const {sigma} = computeSigma(slip_model, Z, beta2, km, sigma_const);
+
+    // Euler head
+    const H_euler = sigma * u2 * Vu2_th / g;
+
+    // Inlet — fully recomputed
+    const Vm1  = Q / A1;
+    const b1f  = Math.atan(Vm1 / (u1 - Vu1 + 1e-12)) * 180 / Math.PI;
+    const inc  = beta1_design - b1f;   // [deg]
+
+    // Head-side losses
+    const H_hyd   = k_h * Vm2**2 / (2*g) * (D2 / b2);
+    const i_rad   = Math.abs(inc) * Math.PI / 180;
+    const H_shock = k_i * i_rad**2 * u1**2 / (2*g);
+
+    const H_net   = H_euler - H_hyd - H_shock;
+    const P_useful= rho * g * Q * H_net;
+    const P_shaft = P_useful + P_df;
+    const eta     = P_shaft > 0 ? P_useful / P_shaft : 0;
+
+    pts.push({ Q, H:H_net, eta, P:P_shaft, sigma, km, incidence:inc,
+               H_euler, H_hyd, H_shock, P_df });
+  }
+  return pts;
+}
+
+function runPerformanceCurve(){
+  const res = caseResults[activeCase];
+  if(!res || !res.converged){ alert('Run Design Mode first.'); return; }
+
+  const spanLo = parseFloat(document.getElementById('perf-span-lo').value) || 0.3;
+  const spanHi = parseFloat(document.getElementById('perf-span-hi').value) || 1.4;
+  const nPts   = parseInt(document.getElementById('perf-npts').value)      || 30;
+
+  // Build design object from solved case result
+  const design = {
+    D2: res.D2, b2: res.b2, D1: res.D1_used, b1: res.b1_used,
+    n: res.n, beta2: res.beta2d, beta1: res.beta1,
+    Z: res.Z, sigma_const: res.sigC,
+    slip_model: res.model,
+    k_h: 0.15, k_i: 0.5, k_df: 1.5e-3, rho: res.rho,
+    Q_design: res.Q, Vu1: res.Vu1 || 0,
+  };
+
+  const Q_lo   = spanLo * res.Q;
+  const Q_hi   = spanHi * res.Q;
+  const step   = (Q_hi - Q_lo) / (nPts - 1);
+  const Qlist  = Array.from({length: nPts}, (_, i) => Q_lo + i * step);
+
+  const curve = computePerformanceCurve(design, Qlist);
+  res.perfCurve  = curve;
+  res.perfDesign = design;
+
+  document.getElementById('perf-card').classList.remove('perf-card-hidden');
+  drawPerfChart(curve, res);
+  renderPerfTable(curve, res);
+}
+
+function drawPerfChart(curve, res){
+  const svg   = document.getElementById('perf-svg');
+  const W=700, H=260, mx=60, my=24, mr=20, mb=52;
+  const cw=W-mx-mr, ch=H-my-mb;
+  const BEP_R = 5;  // BEP marker radius — clip path padded by this amount
+
+  if(!curve || !curve.length){ svg.innerHTML=''; return; }
+
+  // Series to draw
+  const seriesMap = {
+    H:   { key:'H',         label:'H_net (m)',  color:'#8B9EC9', unit:'m'  },
+    eta: { key:'eta',       label:'η (—)',       color:'#B8C8A2', unit:''   },
+    P:   { key:'P',         label:'P_shaft (kW)',color:'#C9A8B8', unit:'kW' },
+    inc: { key:'incidence', label:'Incidence (°)',color:'#D4A97A',unit:'°'  },
+  };
+  const ser = seriesMap[_perfTab];
+  const yMul = ser.key === 'P' ? 1/1000 : 1;
+
+  const Qvals = curve.map(p=>p.Q * 1000);   // L/s for x-axis readability
+  const Yvals = curve.map(p=>p[ser.key] * yMul);
+  const Qd    = res.Q * 1000;
+
+  const xMin=Math.min(...Qvals), xMax=Math.max(...Qvals);
+  const yMin=Math.min(...Yvals), yMax=Math.max(...Yvals);
+  const yPad = (yMax-yMin)*0.12 || 1;
+  const xScale = v => mx + (v-xMin)/(xMax-xMin||1)*cw;
+  const yScale = v => my+ch - (v-(yMin-yPad))/((yMax+yPad)-(yMin-yPad))*ch;
+
+  // BEP (max eta)
+  const bepIdx = curve.reduce((bi,p,i,a)=>p.eta>a[bi].eta?i:bi, 0);
+
+  // Two clip paths: one tight for the curve/lines, one padded for the BEP marker
+  let s = `<defs>
+    <clipPath id="chart-clip"><rect x="${mx}" y="${my}" width="${cw}" height="${ch}"/></clipPath>
+    <clipPath id="chart-clip-pad"><rect x="${mx-BEP_R}" y="${my-BEP_R}" width="${cw+BEP_R*2}" height="${ch+BEP_R*2}"/></clipPath>
+  </defs>`;
+
+  // Grid lines (y)
+  const nYticks = 5;
+  for(let i=0;i<=nYticks;i++){
+    const yv = (yMin-yPad) + i/nYticks*((yMax+yPad)-(yMin-yPad));
+    const yp = yScale(yv);
+    s += `<line x1="${mx}" y1="${yp}" x2="${mx+cw}" y2="${yp}" stroke="var(--border2)" stroke-width="1"/>`;
+    s += `<text x="${mx-6}" y="${yp+4}" text-anchor="end" font-size="10" fill="var(--text3)">${yv.toFixed(ser.key==='eta'?3:1)}</text>`;
+  }
+  // x-axis ticks
+  const nXticks = 6;
+  for(let i=0;i<=nXticks;i++){
+    const xv = xMin + i/nXticks*(xMax-xMin);
+    const xp = xScale(xv);
+    s += `<line x1="${xp}" y1="${my}" x2="${xp}" y2="${my+ch}" stroke="var(--border2)" stroke-width="1"/>`;
+    s += `<text x="${xp}" y="${my+ch+16}" text-anchor="middle" font-size="10" fill="var(--text3)">${xv.toFixed(1)}</text>`;
+  }
+  // Axes border
+  s += `<rect x="${mx}" y="${my}" width="${cw}" height="${ch}" fill="none" stroke="var(--border2)" stroke-width="1"/>`;
+  // Axis labels — x label sits between tick numbers (my+ch+16) and bottom of SVG
+  s += `<text x="${mx+cw/2}" y="${my+ch+34}" text-anchor="middle" font-size="11" fill="var(--text2)">Q (L/s)</text>`;
+  s += `<text transform="translate(14,${my+ch/2}) rotate(-90)" text-anchor="middle" font-size="11" fill="var(--text2)">${ser.label}</text>`;
+
+  // Design point vertical line
+  if(Qd >= xMin && Qd <= xMax){
+    const xd = xScale(Qd);
+    s += `<line x1="${xd}" y1="${my}" x2="${xd}" y2="${my+ch}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4,3" clip-path="url(#chart-clip)"/>`;
+    s += `<text x="${xd+4}" y="${my+12}" font-size="9" fill="var(--accent)">Q_design</text>`;
+  }
+
+  // Main curve
+  const pts = curve.map(p=>`${xScale(p.Q*1000).toFixed(1)},${yScale(p[ser.key]*yMul).toFixed(1)}`).join(' ');
+  s += `<polyline points="${pts}" fill="none" stroke="${ser.color}" stroke-width="2.2" clip-path="url(#chart-clip)"/>`;
+
+  // BEP marker — use padded clip so the circle is never half-cut at plot boundary
+  if(ser.key !== 'incidence'){
+    const bx = xScale(curve[bepIdx].Q*1000);
+    const by = yScale(curve[bepIdx][ser.key]*yMul);
+    s += `<circle cx="${bx}" cy="${by}" r="${BEP_R}" fill="${ser.color}" stroke="white" stroke-width="1.5" clip-path="url(#chart-clip-pad)"/>`;
+    s += `<text x="${bx+8}" y="${by+3}" font-size="9" fill="${ser.color}" clip-path="url(#chart-clip-pad)">BEP</text>`;
+  }
+
+  svg.innerHTML = s;
+
+  // Legend
+  document.getElementById('perf-legend').innerHTML =
+    `<div class="perf-legend-item"><span class="perf-legend-dot" style="background:${ser.color}"></span>${ser.label}</div>` +
+    `<div class="perf-legend-item"><span class="perf-legend-dot" style="background:var(--accent);opacity:0.6"></span>Q_design</div>` +
+    (ser.key!=='incidence'?`<div class="perf-legend-item">● BEP (max η) at Q = ${(curve[bepIdx].Q*1000).toFixed(2)} L/s, η = ${(curve[bepIdx].eta*100).toFixed(1)}%</div>`:'');
+}
+
+function renderPerfTable(curve, res){
+  const bepIdx = curve.reduce((bi,p,i,a)=>p.eta>a[bi].eta?i:bi, 0);
+  let h = `<thead><tr>
+    <th>Q (L/s)</th><th>H_net (m)</th><th>η (—)</th><th>P_shaft (kW)</th>
+    <th>σ</th><th>km</th><th>Incidence (°)</th><th>H_euler (m)</th><th>H_hyd (m)</th><th>H_shock (m)</th>
+  </tr></thead><tbody>`;
+  curve.forEach((p,i)=>{
+    const cls = i===bepIdx ? 'bep' : '';
+    const inc = p.incidence >= 0 ? `+${p.incidence.toFixed(2)}` : p.incidence.toFixed(2);
+    h += `<tr class="${cls}">
+      <td>${(p.Q*1000).toFixed(3)}</td>
+      <td>${p.H.toFixed(3)}</td>
+      <td>${p.eta.toFixed(4)}</td>
+      <td>${(p.P/1e3).toFixed(3)}</td>
+      <td>${p.sigma.toFixed(4)}</td>
+      <td>${p.km.toFixed(4)}</td>
+      <td>${inc}</td>
+      <td>${p.H_euler.toFixed(3)}</td>
+      <td>${p.H_hyd.toFixed(3)}</td>
+      <td>${p.H_shock.toFixed(3)}</td>
+    </tr>`;
+  });
+  h += '</tbody>';
+  document.getElementById('perf-table').innerHTML = h;
+}
+
+/* ── iteration log toggle ── */
+function toggleIterLog(){
+  const log = document.getElementById('iter-log');
+  const toggle = document.getElementById('iter-toggle');
+  const isOpen = log.classList.contains('open');
+  log.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+/* ── status helper ── */
+function showStatus(msg,type){
+  const el=document.getElementById('status');
+  el.className='status show '+type;
+  el.textContent=msg;
+}
+
+/* ── init ── */
+applyCaseCount();
+</script>
+</body>
+</html>
