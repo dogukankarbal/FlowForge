@@ -189,7 +189,7 @@ FlowForge_v1.0_Validation_Report.pdf  — Adım adım validasyon raporu
 
 | Bileşen | Yöntem |
 |---|---|
-| Euler basma yüksekliği | Euler türbomakina denklemi |
+| Euler basma yüksekliği | Euler turbomakina denklemi |
 | Kayma faktörü | Stodola / Wiesner (1967) / Pfleiderer (1961) / sabit σ |
 | Hidrolik sürtünme kaybı | *H*f = *k*h · *H*Euler |
 | Hücum açısı kaybı | *H*i = *k*i · (*Vm₁*²/2g) · *i*² |
